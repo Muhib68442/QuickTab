@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | QuickTab</title>
+    <link rel="icon" type="image/png" href="/res/logo/icon128.png">
+    <link rel="stylesheet" href="../css/main.css">
+</head>
+<body class="settings-body">
+    <section class="settings-sidebar">
+        <div>
+            <img src="/res/logo/icon128.png" alt="QuickTab">
+            <a id="homeBtn">QuickTab</a>
+        </div>
+        <ul>
+            <li><a href="#general">General</a></li>
+            <li><a href="#personalize">Personalize</a></li>
+            <li><a href="#bookmarks">Bookmarks</a></li>
+            <!-- <li><a href="#widgets">Widgets</a></li> -->
+            <li><a href="#about">About</a></li>
+        </ul>
+    </section>
+
+    <main class="settings-main">
+        <!-- GENERAL SETTINGS -->
+        <section id="general">
+            <h3>General Settings</h3>
+
+            <div class="setting">
+                <h4>Time Format</h4>
+                <div class="radio-btn-container">
+                    <input type="radio" id="12h" name="timeFormat" value="12">
+                    <label for="12h">12-hour</label>
+                    <input type="radio" id="24h" name="timeFormat" value="24">
+                    <label for="24h">24-hour</label>
+                </div>
+            </div>
+
+            <!-- <div class="setting">
+                <h4>Date Format</h4>
+                <div class="radio-btn-container">
+                    <input type="radio" id="dmy" name="dateFormat" value="dmy">
+                    <label for="dmy">DMY</label>
+                    <input type="radio" id="mdy" name="dateFormat" value="mdy">
+                    <label for="mdy">MDY</label>
+                    <input type="radio" id="ymd" name="dateFormat" value="ymd">
+                    <label for="ymd">YMD</label>
+                </div>
+            </div> -->
+
+            <div class="setting">
+                <h4>Default Search Engine</h4>
+                <select name="searchEngine" id="searchEngine">
+                    <option value="google">Google</option>
+                    <option value="bing">Bing</option>
+                    <option value="duckduckgo">DuckDuckGo</option>
+                    <option value="yandex">Yandex</option>
+                </select>
+            </div>
+
+            <div class="setting">
+                <h4>Weather Location</h4>
+                <div>
+                    <input type="text" id="weatherLocation" placeholder="City Name">
+                    <button id="setWeatherLocation" style="width:40px; height:40px; font-size:14px">&#10004;</button>
+                </div>
+            </div>
+            
+            <div class="setting">
+                <h4>Refresh QuickTab</h4>
+                <button id="refreshBtn">Refresh</button>
+            </div>
+
+            <!-- <div class="setting">
+                <h4>Disable QuickTab</h4>
+                <button id="disableBtn">Disable</button>
+            </div> -->
+
+            <div class="setting">
+                <h4>Reset to Default</h4>
+                <button id="resetBtn">Reset</button>
+            </div>
+
+            <div class="setting">
+                <h4>Import / Export Settings</h4>
+                <div>
+                    <button id="importBtn">Import</button>
+                    <button id="exportBtn">Export</button>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- PERSONALIZE SETTINGS -->
+        <section id="personalize">
+            <h3>Theme</h3>
+            <div class="theme-selector-container">
+                <div class="theme selected-theme">
+                    <img src="/res/theme/theme1/theme1.jpg" alt="theme">
+                    <div>
+                        <p>Theme 1</p>
+                        <button id="applyTheme1">Apply</button>
+                    </div>
+                </div>
+
+                <div class="theme">
+                    <img src="/res/theme/theme2/theme2.jpg" alt="theme">
+                    <div>
+                        <p>Theme 2</p>
+                        <button id="applyTheme2">Apply</button>
+                    </div>
+                </div>
+
+                <div class="theme">
+                    <img src="/res/theme/theme3/theme3.jpg" alt="theme">
+                    <div>
+                        <p>Theme 3</p>
+                        <button id="applyTheme3">Apply</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="color-picker">
+                <h4>Customize Colors</h4>
+                <div class="color-container">
+                    <div class="color-palette">
+                        <div class="color">
+                            <p>Background</p>
+                            <div>
+                                <input type="color" id="bgColor" value="#dedede">
+
+                                <span id="bgColorValue">#dedede</span>
+                            </div>
+                        </div>
+
+                        <div class="color">
+                            <p>Accent</p>
+                            <div>
+                                <input type="color" id="themeColor" value="#000000">
+                                <span id="themeColorValue">#000000</span>
+                            </div>
+                        </div>
+
+                        <div class="color">
+                            <p>Text</p>
+                            <div>
+                                <input type="color" id="txtColor" value="#000000">
+                                <span id="textColorValue">#000000</span>
+                            </div>
+                        </div>
+                        
+                        <div class="color">
+                            <p>Opacity</p>
+                            <div>
+                                <input type="range" id="opacity" min="00" max="100">
+                                <span id="opacityValue">00%</span>
+                            </div>
+                        </div>
+
+
+                        <div class="color">
+                            <p>Blur</p>
+                            <div>
+                                <input type="range" id="blur" min="0" max="20"  step="2">
+                                <span id="blurValue">5px</span>
+                            </div>
+                        </div>
+                        
+                        <div class="color">
+                            <p>Radius</p>
+                            <div>
+                                <input type="range" id="radius" min="0" max="40"  step="5">
+                                <span id="radiusValue">5px</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="preview">
+                        <img src="/bg.jpg" alt="preview">
+                        <div class="preview-div">
+                            <p>Preview</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wallpaper-selector">
+                <h4>Wallpaper</h4>
+
+                <div>
+                    <div class="image-upload-container">
+                        <div>
+                            <h4>Use Dynamic Wallpaper</h4>
+                            <p>Wallpaper will change automatically on restart/refresh</p>
+                            <button id="useDynamicWallpaper">Use Dynamic</button>
+                        </div>
+                        <div>
+                            <h4>Use Static Wallpaper</h4>
+                            <p>Due to limitations, image uploads are not supported.  
+                            Please place your chosen wallpaper in the extension folder and rename it as <b>bg.jpg</b>.  
+                            The file must be located at <code>/bg.jpg</code> for it to work.</p>
+                            <!-- <input type="file" id="wallpaper" accept="image/*"> -->
+                            <button id="useStaticWallpaper">Set Static Wallpaper</button>
+                        </div>
+                    </div>
+    
+                    <div class="wallpaper-preview">
+                        <img src="/bg.jpg" alt="preview">
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- BOOKMARKS -->
+        <section id="bookmarks">
+            <h3>Bookmarks</h3>
+            <div>
+                <div class="bookmark-add-container">
+                    <h4>Add Bookmark</h4>
+                    <div>
+                        <input type="text" id="bookmarkName" placeholder="Bookmark Name" required>
+                        <input type="text" id="bookmarkUrl" placeholder="Bookmark URL" value="https://" required>
+                        <button id="addBookmark">Add</button>
+                    </div>
+                </div>
+
+                <div class="bookmark-show-container">
+                    <ul id="bookmarkList">
+
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- WIDGETS -->
+        <!-- <section id="widgets">
+            <h3>Widgets</h3>
+            <div>
+                <div class="weather-location">
+                    <h4>Weather Location</h4>
+                    <input type="text" id="weatherLocation" placeholder="City Name">
+                    <button id="setWeatherLocation">Set Location</button>
+                </div>
+
+            </div>
+                
+        </section> -->
+        
+        <!-- ABOUT -->
+        <section id="about">
+            <h3>About</h3>
+            <div>
+                <img src="/res/logo/quicktab.png" alt="QuickTab">
+                <div>
+                    <p>QuickTab is a minimal, customizable browser homepage designed to boost productivity and personalize your browsing experience.</p>
+                    <p>Version 1.0.1</p>
+                    <p>Copyright &copy; <span id="year"></span> QuickTab. All rights reserved.</p>
+                    <br>
+                    <a href="https://github.com/muhib68442/quicktab/" target="_blank">GitHub</a>
+                    <a href="https://muhib68442.github.io/Portfolio" target="_blank">Developer</a>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+    </main>
+
+</body>
+<script src="/res/js/jquery.js"></script>
+<script src="/res/js/settings.js"></script>
+</html>

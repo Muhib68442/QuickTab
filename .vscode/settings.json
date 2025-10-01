@@ -1,0 +1,7 @@
+{
+  // "liveSassCompile.settings.generateMap": false,
+  "liveSassCompile.settings.showOutputWindowOn": "None"
+}
+
+// generateMap: false → source map banabe na
+// showOutputWindow: false → terminal log show hobe na

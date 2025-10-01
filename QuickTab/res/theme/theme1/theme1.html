@@ -1,0 +1,162 @@
+<style>
+    section{
+        position : absolute;
+        top: 80%;
+        left: 0%;
+
+        width : 100%;
+        padding : 0px 20px;
+        
+        display : flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+
+        /* position : sticky; */
+        /* top : 40px; */
+    }
+
+    p{
+        color: var(--text-w);
+        font-size: 26px;
+        font-family: fontM;
+    }
+    p#time{
+        /* font-size : 2.6rem; */
+        font-size : 40px;
+        font-family: fontSB;
+    }
+
+    button{
+        border-radius: 50px;
+        background-color: var(--bg-primary);
+        border : none;
+        display: flex;
+        align-items: center;
+        padding : 12px;
+    }
+
+    button img{
+        width:  28px;
+        height: 28px;
+    }
+    button:hover{
+        cursor: pointer;
+        background-color: var(--bg-secondary);
+    }
+
+    #tabBtn img, .searchbar img{
+        width: 25px;
+        height: 25px;
+    }
+
+
+
+    .searchbar{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+
+        background-color: var(--bg-primary);
+        backdrop-filter: blur(5px);
+        border-radius: 40px;
+        padding : 10px 20px;
+        width: 100%;
+    }
+    .searchbar input{
+        background-color: transparent;
+        border : none;
+        color: var(--text-w);
+        font-size: 18px;
+        font-family: fontM;
+        width: 100% !important;
+        padding-left: 10px;
+    }
+    .searchbar input:focus{
+        outline: none;
+    }
+
+    section div{
+        min-width : 54%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap : 20px;
+    }
+
+    .tabContainer {
+        display: flex;          /* horizontal layout */
+        flex-wrap: nowrap;      /* nowrap = scrollable row */
+        overflow-x: auto;       /* horizontal scroll */
+        align-items: center;
+        justify-content: flex-start; /* left align items */
+        gap: 20px;
+        padding: 10px;
+        background-color: var(--bg-primary);
+        border-radius: 10px;
+        position: absolute;
+        top: 68%;
+        left: 50%;
+        transform: translateX(-50%);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(5px);
+        max-width: 90%;
+        display: none;
+    }
+
+    .tabContainer a{
+        text-decoration: none;
+        color : var(--text-w);
+        font-size : 20px;
+        font-family : fontM;
+        padding : 4px 10px;
+        transition : 0.2s;
+    }
+    .tabContainer a:hover{
+        background-color: var(--bg-secondary);
+        border-radius: 10px;
+        transition : 0.2s;
+    }
+    .settingsBtn{
+        color : var(--text-w) !important;
+    }
+
+    @media screen and (max-width: 600px) {
+        section{
+            flex-direction: column;
+            top : 50%;
+        }
+        section div{
+            gap : 10px;
+        }
+        section p:last-child {
+            order: 1; 
+        }
+    }
+</style>
+<main>
+    <section>
+        <p id="time"></p>
+        <div>
+            <button id="tabBtn">
+                <img src="/res/logo/tabs.svg" alt="tabs">
+            </button>
+            <div class="searchbar">
+                <img src="/res/logo/search.svg" alt="search">
+                <input type="text" placeholder="">
+                <img src="/res/logo/angler.svg" alt=">">
+            </div>
+        </div>
+        <p id="date"></p>
+    </section>
+
+    <div class="tabContainer">
+        <a href="#">YouTube</a>
+        <a href="#">MDL</a>
+        <a href="#">Mail</a>
+        <a href="/res/theme/settings.html" class="settingsBtn">Settings</a>
+    </div>
+</main>
+<!-- <script src="/res/js/jquery.js"></script> -->
+<!-- <script src="/res/js/theme.js"></script> -->

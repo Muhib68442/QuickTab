@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickTab</title>
+    <link rel="stylesheet" href="res/css/style.css">
+
+</head>
+<body>
+    <header>
+        <!-- <h1>QuickTab</h1> -->
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#demo">Demo</a></li>
+                <li><a href="#download">Download</a></li>
+                <li><a href="#setup">Setup</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-container">
+                <div class="hero-text">
+                    <h3>QuickTab</h3>
+                    <p>Your smarter, faster new tab</p>
+                    <div>
+                        <a href="#download">Download</a>
+                        <a href="#about">Explore</a>
+                    </div>
+                </div>
+    
+                <div class="carousel">
+                    <img src="res/images/slide1.png" class="active">
+                    <img src="res/images/slide2.png">
+                    <img src="res/images/slide3.png">
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT -->
+        <section class="about" id="about">
+            <!-- <h3>About</h3> -->
+            <div class="about-container">
+                <div class="about-text-container">
+                    <div class="sliderBox" id="mySlider">
+                        <img src="res/images/frame1.png" class="slideImg showing">
+                        <img src="res/images/frame2.png" class="slideImg">
+                        <img src="res/images/frame3.png" class="slideImg">
+                        <img src="res/images/frame4.png" class="slideImg">
+                        <img src="res/images/frame5.png" class="slideImg">
+                    </div>
+                </div>
+                
+                <div class="about-feature-container">
+                    <p><span class="highlight">QuickTab</span> is a lightweight and modern <span class="highlight">Chrome Extension</span> that replaces your boring <span class="highlight">new tab</span> with a smarter, faster, and customizable dashboard.</p>
+                    <p>It’s designed to boost productivity and give you quick access to the things that matter most.</p>
+                    <ul class="feature-list">
+                        <li><b>Aesthetic Themes</b> – Make every new tab visually inspiring.</li>
+                        <li><b>Smart Widgets</b> – Calendar, Notes, To-Do list at your fingertips.</li>
+                        <li><b>Ultimate Usefulness</b> – Access what matters instantly.</li>
+                        <li><b>Settings & Customization</b> – Adjust colors, layout, and style your way.</li>
+                        <li><b>Seamless Experience</b> – Fast, lightweight, and distraction-free.</li>
+                    </ul>
+                </div>
+            
+            </div>
+        </section>
+
+        <!-- DEMO -->
+        <section id="demo">
+            <div class="demo-container">
+                <div class="mockup-container" style="position: relative; width: 70%; margin: auto;">
+                    <!-- Laptop mockup image -->
+                    <img src="res/images/mockup.png" alt="mockup">
+    
+                    <!-- Iframe overlay -->
+                    <div class="iframe-wrapper" style="
+                        
+                      
+                    ">
+                        <iframe src="./QuickTab/index.html" style="
+
+                        "></iframe>
+                    </div>
+                </div>
+                <div class="demo-text-container">
+                    <h3>Give it a Try !</h3>
+                    <p>Experience the power of <span class="highlight">QuickTab</span> in action. Try it out here and discover the difference it can make in your daily browsing experience.</p>
+                    <p><- Scroll Preview to try demo</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DOWNLOAD & SETUP -->
+        <section id="download">
+            <div class="download-container">
+                <h3>Download Now</h3>
+                <p>Filename : QuickTab v1.0.1 .zip</p>
+                <p>File Size : 1.2 MB</p>
+                
+                <button><a href="#">Download</a></button>
+                <button class="githubBtn"><a href="#" target="_blank">GitHub</a></button>
+                
+                <p>> Works best on latest Chrome</p>
+                <p>> Suitable for 1920x1080 screen and others</p>
+                <h4>Changelog v1.0.1</h4>
+                <ul>
+                    <li>Added Themes</li>
+                    <li>Added More Widgets</li>
+                    <li>More Settings & Customization</li>
+                </ul>
+            </div>
+            <div class="setup-container" id="setup">
+                <h3>Setup Process</h3>
+                <ul>
+                    <li>Download the .zip file and extract</li>
+                    <li>Open Chrome and go to  chrome://extensions/</li>
+                    <li>Enable "Developer Mode" in the top right corner</li>
+                    <li>Click "Load unpacked" and browser the extracted folder</li>
+                    <li>Browse the QuickTab folder and Click on Select Folder</li>
+                    <li>On creating a new tab for the first time, <br> click on 'Keep It' to apply as default new tab</li>
+                    <li>Done ! Enjoy your Aesthetic New Tab</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="year"></span> QuickTab. All rights reserved.</p>
+    </footer>
+</body>
+
+<script src="res/js/jquery.js"></script>
+<script src="res/js/script.js"></script>
+</html>

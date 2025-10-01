@@ -1,0 +1,12 @@
+/logo
+/theme 
+/fonts
+/js/settings.js
+/bg.jpg
+
+
+These folders contains svg and theme
+They belongs to QuickTab 
+But for iframe relative path problem, 
+I've dragged these folder here with Landing Page contents. 
+Sori :) 

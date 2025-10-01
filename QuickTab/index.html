@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickTab</title>
+    <link rel="stylesheet" href="res/css/main.css">
+    <link rel="stylesheet" href="res/css/widgets.css">
+
+</head>
+<body>
+    <div id="theme-container">
+
+    </div>
+
+    <!-- WIDGETS -->
+    <div id="widget-container">
+        <div class="menu-page">
+            <!-- ROW 1 -->
+            <div class="widget-wrapper">
+                <div class="calendar-container">
+                    <div class="calendar">
+                        <div class="calendar-header">
+                            <h2 id="currentMonth"></h2>
+                            <div>
+                                <button id="prevMonth">
+                                    <img src="../res/logo/anglel.svg" alt="Prev">
+                                </button>
+                                <button id="nextMonth">
+                                    <img src="../res/logo/angler.svg" alt="Next">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="calendar-body">
+                            <div class="weekdays">
+                                <div>Sun</div>
+                                <div>Mon</div>
+                                <div>Tue</div>
+                                <div>Wed</div>
+                                <div>Thu</div>
+                                <div>Fri</div>
+                                <div>Sat</div>
+                            </div>
+                            
+                            <div class="days"></div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="vertical-wrapper">
+                    <div class="weather-container">
+                        <div class="weather-heading">
+                            <div>
+                                <img src="/res/logo/weather/Cloudy.svg" id="weatherIcon" alt="weather">
+                                <h3 class="weather-value" id="temperature"></h3>
+                            </div>
+                        </div>
+                        <div class="weather-body">
+                            <div class="weather-option">
+                                <img src="/res/logo/weather/Humidity.svg" alt="humidity">
+                                <p class="humidity-value" id="humidity"></p>
+                            </div>
+                            <div class="weather-option">
+                                <img src="../res/logo/weather/Wind.svg" alt="wind_speed">
+                                <p class="humidity-value" id="windSpeed"></p>
+                            </div>
+                            <div class="weather-option">
+                                <img src="../res/logo/weather/Temperature.svg" alt="feels_like">
+                                <p class="humidity-value" id="feelsLike"></p>
+                            </div>
+                            <div class="weather-option">
+                                <img src="../res/logo/weather/Thermometer.svg" alt="temp_min_max">
+                                <p class="humidity-value" id="highTemp"></p>
+                            </div>
+                        </div>
+                        <div class="weather-footer">
+                            <p id="location"></p>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="calculator-container">
+                        <div class="calculator-heading">
+                            <img src="/res/logo/calculator.svg" alt="calculator">
+                            <p class="calc-value" id="calcResult" >= </p>
+                        </div>
+                        <input type="text" id="calcInput" placeholder="..." autocomplete="off">
+                    </div>
+                </div>
+
+
+                <div class="bookmark-container">
+                    <div class="bookmark-heading">
+                        <img src="../res/logo/bookmark.svg" alt="bookmark">
+                        <img src="../res/logo/add.svg" id="manageBookmarkBtn" alt="manage">
+                    </div>
+                    <div id="bookmark-body">
+                        <!-- <a class="bookmark-option">
+                            <img src="https://www.google.com/s2/favicons?domain=facebook.com&size=128" alt="">
+                            <p class="bookmark-value">Facebook</p>
+                        </a> -->
+                    </div>
+                </div>
+                
+            </div>
+
+            <!-- ROW 2 -->
+            <div class="widget-wrapper">
+                <div class="notepad-container" id="notepadContainer">
+                    <div class="notepad-heading">
+                        <img class="notepad_logo" src="../res/logo/notepad.svg" alt="notepad">
+            
+                        <div class="notepad-btn">
+                            <!-- <img src="../logo/save.svg" alt="save"  id="saveBtn"> -->
+                            <img src="../res/logo/undo.svg" alt="reset"  id="resetBtn">
+                            <img src="../res/logo/save.svg" alt="save" id="exportBtn">
+                        </div>
+                    </div>
+                    <div class="notepad-body">
+                        <textarea spellcheck="false" name="notepad" id="notepad" placeholder="Write your thoughts..."></textarea>
+                    </div>
+                </div>
+
+
+
+                <div class="todo-container">
+                        <div class="todo-heading">
+                            <img src="../res/logo/todo.svg" alt="todo">
+                            <img src="../res/logo/delete.png" alt="del" id="deleteAllTaskBtn">
+                        </div>
+                        <div class="todo-body">
+                            <ul>
+                            <!-- <li> 
+                                <div class="todo-task">
+                                    <span class="todo-check"></span>
+                                    <p class="taskName">No Task</p>
+                                </div> 
+                                
+                                <img src="../res/logo/close.svg" alt="delete">
+                            </li> -->
+                            </ul>
+
+                        </div>
+
+                        <div class="todo-addTaskBody">
+                            <input type="text" id="taskName" placeholder="Task Name">
+                            <img src="../res/logo/add.svg" id="addTaskBtn" alt="add">
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="/res/js/jquery.js"></script>
+<script src="res/js/script.js" ></script>
+
+<!-- JS -->
+</html>
