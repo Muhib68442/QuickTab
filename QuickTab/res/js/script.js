@@ -1,5 +1,5 @@
 // MAIN JS 
-$(document).ready(function(){
+$(document).ready(function () {
 
 
     let key = "quicktab";
@@ -7,9 +7,9 @@ $(document).ready(function(){
 
 
     // INITIAL SETTINGS
-    function setInitial(key){
-        
-        let value = 
+    function setInitial(key) {
+
+        let value =
         {
             "bookmarks": [
                 {
@@ -50,7 +50,7 @@ $(document).ready(function(){
         }
         localStorage.setItem(key, JSON.stringify(value));
     }
-    if(!localStorage.getItem(key)){
+    if (!localStorage.getItem(key)) {
         setInitial(key);
         window.location.reload(true);
     }
@@ -59,29 +59,29 @@ $(document).ready(function(){
 
 
 
-    
+
     let selectedTheme = data.settings.theme;
     console.log(selectedTheme);
-    
-    $("#theme-container").load("/res/theme/"+selectedTheme+"/"+selectedTheme+".html", function () {
+
+    $("#theme-container").load("/res/theme/" + selectedTheme + "/" + selectedTheme + ".html", function () {
         initTheme();
     });
 
     // LOAD WALLPAPER 
     let isDynamic = data.settings.wallpaper == "dynamic" ? true : false;
-    if(isDynamic){
+    if (isDynamic) {
         $("body").css("background-image", "url(https://picsum.photos/1920/1080)");
-    }else{
+    } else {
         let link = "/bg.jpg";
         $("body").css("background-image", "url(" + link + ")");
     }
 
 
     // APPLY WEATHER API
-    function weather(){    
+    function weather() {
 
         function fetchWeatherData() {
-            const apiKey = '0d4fa78962b1bff5497c512a23db006d'; 
+            const apiKey = '0d4fa78962b1bff5497c512a23db006d';
             // fetch location from localstorage 
             const location = data.settings.weatherLocation;
             const apiUrl = 'https://api.openweathermap.org/data/2.5/weather?q=' + location + '&units=metric&appid=' + apiKey;
@@ -91,7 +91,7 @@ $(document).ready(function(){
                 .then(data => {
                     // console.log(data);
                     // use int data
-                    
+
                     document.getElementById('temperature').textContent = parseInt(data.main.temp) + '°C';
                     document.getElementById('humidity').textContent = data.main.humidity + '%';
 
@@ -111,14 +111,14 @@ $(document).ready(function(){
         }
 
         fetchWeatherData();
-    }weather();
+    } weather();
 
 
     // SHOW BOOKMARKS IS IN "widgets.js"
 
-    
+
     // APPLY THEME 
-    function theme(){
+    function theme() {
         // GET THEME DATA 
         let opacity = data.theme.opacity;
         let blur = data.theme.blur;
@@ -126,9 +126,9 @@ $(document).ready(function(){
         let bgColor = data.theme.background;
         let txtColor = data.theme.text;
         let themeColor = data.theme.primary;
-    
+
         // APPLY THEMES
-        document.documentElement.style.setProperty('--bg-secondary', bgColor+opacity);
+        document.documentElement.style.setProperty('--bg-secondary', bgColor + opacity);
         // document.documentElement.style.setProperty('--opacity', opacity);
         document.documentElement.style.setProperty('--blur', blur + 'px');
         document.documentElement.style.setProperty('--radius', radius + 'px');
@@ -141,13 +141,13 @@ $(document).ready(function(){
 
 
     console.log("script.js loaded");
-    
-    
-    
+
+
+
     // THEME JS 
-    function initTheme(){
-    
-    
+    function initTheme() {
+
+
         // DATE TIME 
         function updateTimeDate() {
             const now = new Date();
@@ -155,12 +155,12 @@ $(document).ready(function(){
             let minutes = now.getMinutes();
             minutes = minutes < 10 ? '0' + minutes : minutes;
 
-            if(data.settings.timeFormat == "24"){
-                $("#time").text(hours + ':' + minutes); 
+            if (data.settings.timeFormat == "24") {
+                $("#time").text(hours + ':' + minutes);
             } else {
                 let ampm = hours >= 12 ? 'PM' : 'AM';
                 let displayHours = hours % 12;
-                displayHours = displayHours ? displayHours : 12; 
+                displayHours = displayHours ? displayHours : 12;
                 $("#time").text(displayHours + ':' + minutes + ' ' + ampm);
             }
 
@@ -170,32 +170,32 @@ $(document).ready(function(){
         updateTimeDate();
         setInterval(updateTimeDate, 1000);
 
-    
+
         // TAB
-        $("#tabBtn").click(function(){
+        $("#tabBtn").click(function () {
             // $(".tabContainer").fadeToggle(100).css("display", "flex");
             window.location.href = "/res/theme/settings.html";
         })
-    
+
         // SEARCH 
-        $(".searchbar input").on("keypress", function(e){
-            if(e.which === 13){ // Enter key
+        $(".searchbar input").on("keypress", function (e) {
+            if (e.which === 13) { // Enter key
                 let query = $(this).val().trim();
-                if(!query) return; 
+                if (!query) return;
 
                 let url;
 
                 // Check if input looks like a URL
-                if(query.match(/^https?:\/\//)) {
+                if (query.match(/^https?:\/\//)) {
                     url = query;
-                } else if(query.match(/\.[a-z]{2,}$/i)) {
-                    if(!query.startsWith("http://") && !query.startsWith("https://")){
+                } else if (query.match(/\.[a-z]{2,}$/i)) {
+                    if (!query.startsWith("http://") && !query.startsWith("https://")) {
                         url = "http://" + query;
                     } else {
                         url = query;
                     }
                 } else {
-                    switch(data.settings.searchEngine){
+                    switch (data.settings.searchEngine) {
                         case "bing":
                             url = "https://www.bing.com/search?q=" + encodeURIComponent(query);
                             break;
@@ -216,30 +216,30 @@ $(document).ready(function(){
 
         console.log("Theme JS Loaded");
 
-        $(document).ready(function(){
+        $(document).ready(function () {
             $(".searchbar input").focus();
         });
-        
+
     }
 
-});    
+});
 
 
 
 
 
 // WIDGETS JS
-$(document).ready(function(){
+$(document).ready(function () {
 
     let key = "quicktab";
     let data = JSON.parse(localStorage.getItem(key)) || {};
 
 
-////////// BOOKMARKS //////////
-function bookmarks(){
+    ////////// BOOKMARKS //////////
+    function bookmarks() {
         $(".bookmark-body").empty();
         let bookmarks = data.bookmarks;
-        for(let i = 0; i < bookmarks.length; i++){
+        for (let i = 0; i < bookmarks.length; i++) {
             let name = bookmarks[i].name;
             let link = bookmarks[i].url;
             // console.log("Name :"+name, "Link :"+link);
@@ -247,36 +247,36 @@ function bookmarks(){
                 <a class="bookmark-option" href="${link}">
                     <img src="https://www.google.com/s2/favicons?domain=${link}&size=128" alt="${name}">
                     <p class="bookmark-value">${name}</p>
-                </a>`); 
+                </a>`);
         }
     }
-bookmarks();
-$("#manageBookmarkBtn").click(function(){
-    window.location.href = "/res/theme/settings.html#bookmarks";
-});
+    bookmarks();
+    $("#manageBookmarkBtn").click(function () {
+        window.location.href = "/res/theme/settings.html#bookmarks";
+    });
 
-////////// TO DO LIST //////////
-function todo() {
-    function getTasks() {
-        return data.todo || [];
-    }
+    ////////// TO DO LIST //////////
+    function todo() {
+        function getTasks() {
+            return data.todo || [];
+        }
 
-    function saveTasks(tasks) {
-        data.todo = tasks;
-        localStorage.setItem(key, JSON.stringify(data));
-    }
+        function saveTasks(tasks) {
+            data.todo = tasks;
+            localStorage.setItem(key, JSON.stringify(data));
+        }
 
-    function generateId() {
-        return 't_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-    }
+        function generateId() {
+            return 't_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+        }
 
-    function addTask(taskName) {
-        const tasks = getTasks();
-        const task_id = generateId();
-        tasks.push({ id: task_id, name: taskName, completed: false });
-        saveTasks(tasks);
+        function addTask(taskName) {
+            const tasks = getTasks();
+            const task_id = generateId();
+            tasks.push({ id: task_id, name: taskName, completed: false });
+            saveTasks(tasks);
 
-        const $li = $(`
+            const $li = $(`
             <li style="display:none;" data-id="${task_id}">
                 <div class="todo-task">
                     <span class="todo-check"></span>
@@ -285,37 +285,37 @@ function todo() {
                 <img src="../res/logo/close.svg" class="deleteTask" alt="delete">
             </li>
         `);
-        $('.todo-body ul').append($li);
-        $li.slideDown(200);
-    }
-
-    function removeTask(task_id) {
-        let tasks = getTasks();
-        tasks = tasks.filter(t => t.id !== task_id);
-        saveTasks(tasks);
-
-        const $li = $(`li[data-id='${task_id}']`);
-        $li.slideUp(200, function() {
-            $(this).remove();
-        });
-    }
-
-    function toggleTaskCompletion(task_id) {
-        const tasks = getTasks();
-        const task = tasks.find(t => t.id === task_id);
-        if (task) {
-            task.completed = !task.completed;
-            saveTasks(tasks);
-            displayTasks();
+            $('.todo-body ul').append($li);
+            $li.slideDown(200);
         }
-    }
 
-    function displayTasks() {
-        const tasks = getTasks();
-        const $list = $('.todo-body ul');
-        $list.empty();
-        tasks.forEach(task => {
-            const $li = $(`
+        function removeTask(task_id) {
+            let tasks = getTasks();
+            tasks = tasks.filter(t => t.id !== task_id);
+            saveTasks(tasks);
+
+            const $li = $(`li[data-id='${task_id}']`);
+            $li.slideUp(200, function () {
+                $(this).remove();
+            });
+        }
+
+        function toggleTaskCompletion(task_id) {
+            const tasks = getTasks();
+            const task = tasks.find(t => t.id === task_id);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks(tasks);
+                displayTasks();
+            }
+        }
+
+        function displayTasks() {
+            const tasks = getTasks();
+            const $list = $('.todo-body ul');
+            $list.empty();
+            tasks.forEach(task => {
+                const $li = $(`
                 <li data-id="${task.id}">
                     <div class="todo-task">
                         <span class="todo-check ${task.completed ? 'completed' : ''}"></span>
@@ -324,310 +324,406 @@ function todo() {
                     <img src="../res/logo/close.svg" class="deleteTask" alt="delete">
                 </li>
             `);
-            $list.append($li);
+                $list.append($li);
+            });
+        }
+
+        // Toggle completion
+        $('.todo-body ul').off("click", ".todo-check").on('click', '.todo-check', function () {
+            const task_id = $(this).closest('li').data('id');
+            toggleTaskCompletion(task_id);
         });
-    }
 
-    // Toggle completion
-    $('.todo-body ul').off("click", ".todo-check").on('click', '.todo-check', function() {
-        const task_id = $(this).closest('li').data('id');
-        toggleTaskCompletion(task_id);
-    });
+        // Delete task
+        $('.todo-body ul').off("click", ".deleteTask").on('click', '.deleteTask', function () {
+            const task_id = $(this).closest('li').data('id');
+            removeTask(task_id);
+        });
 
-    // Delete task
-    $('.todo-body ul').off("click", ".deleteTask").on('click', '.deleteTask', function() {
-        const task_id = $(this).closest('li').data('id');
-        removeTask(task_id);
-    });
-
-    // Add task button
-    $('#addTaskBtn').off("click").on('click', function() {
-        const taskName = $('#taskName').val().trim();
-        if(taskName) {
-            addTask(taskName);
-            $('#taskName').val('');
-        } else {
-            alert('Please enter a task name.');
-        }
-    });
-
-    // Delete all tasks
-    $("#deleteAllTaskBtn").off("click").on('click', function() {
-        if (confirm("Reset all tasks ?")) {
-            data.todo = [];
-            localStorage.setItem(key, JSON.stringify(data));
-            displayTasks();
-        }
-    })
-
-    // Enter key on input
-    $('#taskName').off("keypress").on('keypress', function(event) {
-        if(event.key === 'Enter') {
-            event.preventDefault();
-            const taskName = $(this).val().trim();
-            if(taskName) {
+        // Add task button
+        $('#addTaskBtn').off("click").on('click', function () {
+            const taskName = $('#taskName').val().trim();
+            if (taskName) {
                 addTask(taskName);
-                $(this).val('');
+                $('#taskName').val('');
             } else {
                 alert('Please enter a task name.');
             }
-        }
-    });
+        });
 
-    // EDIT TASK 
-    $(".todo-body ul").on("dblclick", ".taskName", function() {
-        $(this).attr("readonly", false);
-    });
-    $(".todo-body ul").on("blur", ".taskName", function() {
-        $(this).attr("readonly", true);
-        let task_id = $(this).closest("li").data("id");
-        let taskName = $(this).val().trim();
-        if(taskName) {
-            data.todo.forEach((t) => {
-                if(t.id == task_id) {
-                    t.name = taskName;
+        // Delete all tasks
+        $("#deleteAllTaskBtn").off("click").on('click', function () {
+            if (confirm("Reset all tasks ?")) {
+                data.todo = [];
+                localStorage.setItem(key, JSON.stringify(data));
+                displayTasks();
+            }
+        })
+
+        // Enter key on input
+        $('#taskName').off("keypress").on('keypress', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const taskName = $(this).val().trim();
+                if (taskName) {
+                    addTask(taskName);
+                    $(this).val('');
+                } else {
+                    alert('Please enter a task name.');
                 }
-            })
-            localStorage.setItem(key, JSON.stringify(data));
-            displayTasks();
-        }
-    })
-
-    displayTasks();
-}
-
-
-
-////////// NOTEPAD //////////
-function notepad() {
-    const $notepad = $('#notepad');
-    const $resetBtn = $('#resetBtn');
-    const $exportBtn = $('#exportBtn');
-
-    // Load saved content
-    // let data = JSON.parse(localStorage.getItem(key)) || {};
-    if (data.notepad.content) {
-        $notepad.val(data.notepad.content);
-    }
-
-    // Autosave on input
-    $notepad.on('input', function () {
-        data.notepad.content = $notepad.val();
-        localStorage.setItem(key, JSON.stringify(data));
-    });
-
-    // Export notepad content
-    $exportBtn.on('click', function () {
-        const textToSave = $notepad.val();
-        const blob = new Blob([textToSave], { type: "text/plain;charset=utf-8" });
-        saveAs(blob, "QuickTab Note.txt");
-    });
-
-    function saveAs(blob, fileName) {
-        const link = document.createElement("a");
-        link.href = window.URL.createObjectURL(blob);
-        link.download = fileName;
-        link.click();
-    }
-
-    // Reset button
-    $resetBtn.on('click', function () {
-        let confirmReset = window.confirm("Reset Notepad?");
-        if (confirmReset) {
-            $notepad.val('');
-            data.notepad.content = '';
-            localStorage.setItem(key, JSON.stringify(data));
-        }
-    });
-}
-
-
-////////// CALCULATOR //////////
-function calculator() {
-    const calcInput = $('#calcInput');
-    const calcResult = $('#calcResult');
-
-    // Simple CSP-safe parser
-    function safeEval(expr) {
-        // Allow only numbers, operators and parentheses
-        if(!/^[0-9+\-*/().\s]+$/.test(expr)) throw "Invalid expression";
-
-        // Tokenize
-        let tokens = expr.match(/(\d+\.?\d*|\+|\-|\*|\/|\(|\))/g);
-        if(!tokens) throw "Invalid";
-
-        // Shunting-yard algorithm for safe eval
-        let output = [];
-        let ops = [];
-        const precedence = {'+':1, '-':1, '*':2, '/':2};
-        tokens.forEach(t=>{
-            if(!isNaN(t)) output.push(parseFloat(t));
-            else if(['+','-','*','/'].includes(t)){
-                while(ops.length && precedence[ops[ops.length-1]] >= precedence[t]){
-                    output.push(ops.pop());
-                }
-                ops.push(t);
-            } else if(t==='(') ops.push(t);
-            else if(t===')'){
-                while(ops.length && ops[ops.length-1]!=='(') output.push(ops.pop());
-                if(ops[ops.length-1]==='(') ops.pop();
             }
         });
-        while(ops.length) output.push(ops.pop());
 
-        // Evaluate RPN
-        let stack = [];
-        output.forEach(tok=>{
-            if(typeof tok === 'number') stack.push(tok);
-            else{
-                let b = stack.pop();
-                let a = stack.pop();
-                if(tok==='+') stack.push(a+b);
-                if(tok==='-') stack.push(a-b);
-                if(tok==='*') stack.push(a*b);
-                if(tok==='/') stack.push(a/b);
+        // EDIT TASK 
+        $(".todo-body ul").on("dblclick", ".taskName", function () {
+            $(this).attr("readonly", false);
+        });
+        $(".todo-body ul").on("blur", ".taskName", function () {
+            $(this).attr("readonly", true);
+            let task_id = $(this).closest("li").data("id");
+            let taskName = $(this).val().trim();
+            if (taskName) {
+                data.todo.forEach((t) => {
+                    if (t.id == task_id) {
+                        t.name = taskName;
+                    }
+                })
+                localStorage.setItem(key, JSON.stringify(data));
+                displayTasks();
+            }
+        })
+
+        displayTasks();
+    }
+
+
+
+    ////////// NOTEPAD //////////
+    ////////// NOTEPAD //////////
+    function notepad() {
+        const $notepad = $('#notepad');
+        const $notepadPreview = $('#notepadPreview');
+        const $resetBtn = $('#resetBtn');
+        const $exportBtn = $('#exportBtn');
+        const $exportMDBtn = $('#exportMDBtn');
+        const $togglePreviewBtn = $('#togglePreviewBtn');
+        const $toggleSplitBtn = $('#toggleSplitBtn');
+        const $notepadContainer = $('.notepad-container');
+        const $notepadBody = $('.notepad-body');
+
+        // Load saved content
+        if (data.notepad.content) {
+            $notepad.val(data.notepad.content);
+        }
+
+        let isSplit = false;
+        let isPreview = false;
+
+        // Autosave on input & Realtime Preview
+        $notepad.on('input', function () {
+            data.notepad.content = $notepad.val();
+            localStorage.setItem(key, JSON.stringify(data));
+
+            if (isSplit) {
+                const markdownText = $notepad.val();
+                const htmlContent = marked.parse(markdownText);
+                $notepadPreview.html(htmlContent);
             }
         });
-        if(stack.length!==1) throw "Error";
-        return stack[0];
-    }
 
-    // Input event
-    calcInput.on("input", function(){
-        const expr = calcInput.val().trim();
-        if(!expr) {
-            calcResult.text('');
-            return;
-        }
-        try {
-            let res = safeEval(expr);
-            calcResult.text(res);
-        } catch(e){
-            calcResult.text('= ...');
-        }
-    });
+        // Toggle Split View (Switch Logic)
+        $toggleSplitBtn.on('change', function () {
+            isSplit = $(this).is(':checked');
+            const $wrapper = $('.widget-wrapper');
 
-    // Enter key → fill input
-    calcInput.on('keypress', function(e){
-        if(e.which===13){
-            e.preventDefault();
-            calcInput.val(calcResult.text());
-        }
-    });
+            if (isSplit) {
+                $notepadContainer.addClass('split-active');
+                $notepadBody.addClass('split-active');
+                $wrapper.addClass('split-mode');
 
-    // Escape → clear
-    $(document).on('keydown', function(e){
-        if(e.key==='Escape'){
-            calcInput.val('');
-            calcResult.text('');
-        }
-    });
-}
+                // Show both
+                $notepad.show();
+                $notepadPreview.show();
 
+                // Render content
+                const markdownText = $notepad.val();
+                $notepadPreview.html(marked.parse(markdownText));
 
+                // Reset Preview Mode state if it was active
+                if (isPreview) {
+                    isPreview = false;
+                    $togglePreviewBtn.attr('src', 'res/logo/play.svg');
+                }
+            } else {
+                $notepadContainer.removeClass('split-active');
+                $notepadBody.removeClass('split-active');
+                $wrapper.removeClass('split-mode');
 
-
-function calendar(){
-    const $prevMonth = $('#prevMonth');
-    const $nextMonth = $('#nextMonth');
-    const $currentMonth = $('#currentMonth');
-    const $daysContainer = $('.days');
-
-    let today = new Date();
-    let currentYear = today.getFullYear();
-    let currentMonthIndex = today.getMonth();
-
-    renderCalendar(currentYear, currentMonthIndex);
-
-    $prevMonth.on('click', function(){
-        currentMonthIndex--;
-        if(currentMonthIndex < 0){
-            currentMonthIndex = 11;
-            currentYear--;
-        }
-        renderCalendar(currentYear, currentMonthIndex);
-    });
-
-    $nextMonth.on('click', function(){
-        currentMonthIndex++;
-        if(currentMonthIndex > 11){
-            currentMonthIndex = 0;
-            currentYear++;
-        }
-        renderCalendar(currentYear, currentMonthIndex);
-    });
-
-    function renderCalendar(year, month){
-        $daysContainer.empty();
-        $currentMonth.text(getMonthName(month) + ' ' + year);
-
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-        for(let i=0; i<firstDay; i++){
-            $('<div>').addClass('empty-day').appendTo($daysContainer);
-        }
-
-        for(let i=1; i<=daysInMonth; i++){
-            const $day = $('<div>').addClass('day').text(i);
-            if(i === today.getDate() && month === today.getMonth() && year === today.getFullYear()){
-                $day.addClass('current-date');
+                // Return to normal Edit mode
+                $notepad.show();
+                $notepadPreview.hide();
             }
-            $daysContainer.append($day);
+        });
+
+        // Toggle Preview (Single View)
+        $togglePreviewBtn.on('click', function () {
+            // If Split is active, turn it off first
+            if (isSplit) {
+                isSplit = false;
+                $notepadContainer.removeClass('split-active');
+                $notepadBody.removeClass('split-active');
+                $('.widget-wrapper').removeClass('split-mode');
+                $toggleSplitBtn.removeClass('active');
+            }
+
+            if (!isPreview) {
+                // Switch to Full Preview
+                const markdownText = $notepad.val();
+                const htmlContent = marked.parse(markdownText);
+                $notepadPreview.html(htmlContent);
+
+                $notepad.hide();
+                $notepadPreview.show();
+                $(this).attr('src', 'res/logo/edit.svg');
+                isPreview = true;
+            } else {
+                // Switch to Edit
+                $notepadPreview.hide();
+                $notepad.show();
+                $(this).attr('src', 'res/logo/play.svg');
+                isPreview = false;
+            }
+        });
+
+        // Editor/Preview Sync on Reset
+        function updatePreviewIfActive() {
+            if (isPreview || isSplit) {
+                const markdownText = $notepad.val();
+                const htmlContent = marked.parse(markdownText);
+                $notepadPreview.html(htmlContent);
+            }
         }
+
+        // Export notepad content (Original Save - TXT)
+        $exportBtn.on('click', function () {
+            const textToSave = $notepad.val();
+            const blob = new Blob([textToSave], { type: "text/plain;charset=utf-8" });
+            saveAs(blob, "QuickTab Note.txt");
+        });
+
+        // Export as Markdown (New Export - MD)
+        $exportMDBtn.on('click', function () {
+            const textToSave = $notepad.val();
+            const blob = new Blob([textToSave], { type: "text/markdown;charset=utf-8" });
+            saveAs(blob, "QuickTab Note.md");
+        });
+
+        function saveAs(blob, fileName) {
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = fileName;
+            link.click();
+        }
+
+        // Reset button (Clear)
+        $resetBtn.on('click', function () {
+            let confirmReset = window.confirm("Clear Notepad?");
+            if (confirmReset) {
+                $notepad.val('');
+                data.notepad.content = '';
+                localStorage.setItem(key, JSON.stringify(data));
+                updatePreviewIfActive();
+            }
+        });
     }
 
-    function getMonthName(index){
-        const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-        return months[index];
+
+    ////////// CALCULATOR //////////
+    function calculator() {
+        const calcInput = $('#calcInput');
+        const calcResult = $('#calcResult');
+
+        // Simple CSP-safe parser
+        function safeEval(expr) {
+            // Allow only numbers, operators and parentheses
+            if (!/^[0-9+\-*/().\s]+$/.test(expr)) throw "Invalid expression";
+
+            // Tokenize
+            let tokens = expr.match(/(\d+\.?\d*|\+|\-|\*|\/|\(|\))/g);
+            if (!tokens) throw "Invalid";
+
+            // Shunting-yard algorithm for safe eval
+            let output = [];
+            let ops = [];
+            const precedence = { '+': 1, '-': 1, '*': 2, '/': 2 };
+            tokens.forEach(t => {
+                if (!isNaN(t)) output.push(parseFloat(t));
+                else if (['+', '-', '*', '/'].includes(t)) {
+                    while (ops.length && precedence[ops[ops.length - 1]] >= precedence[t]) {
+                        output.push(ops.pop());
+                    }
+                    ops.push(t);
+                } else if (t === '(') ops.push(t);
+                else if (t === ')') {
+                    while (ops.length && ops[ops.length - 1] !== '(') output.push(ops.pop());
+                    if (ops[ops.length - 1] === '(') ops.pop();
+                }
+            });
+            while (ops.length) output.push(ops.pop());
+
+            // Evaluate RPN
+            let stack = [];
+            output.forEach(tok => {
+                if (typeof tok === 'number') stack.push(tok);
+                else {
+                    let b = stack.pop();
+                    let a = stack.pop();
+                    if (tok === '+') stack.push(a + b);
+                    if (tok === '-') stack.push(a - b);
+                    if (tok === '*') stack.push(a * b);
+                    if (tok === '/') stack.push(a / b);
+                }
+            });
+            if (stack.length !== 1) throw "Error";
+            return stack[0];
+        }
+
+        // Input event
+        calcInput.on("input", function () {
+            const expr = calcInput.val().trim();
+            if (!expr) {
+                calcResult.text('');
+                return;
+            }
+            try {
+                let res = safeEval(expr);
+                calcResult.text(res);
+            } catch (e) {
+                calcResult.text('= ...');
+            }
+        });
+
+        // Enter key → fill input
+        calcInput.on('keypress', function (e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                calcInput.val(calcResult.text());
+            }
+        });
+
+        // Escape → clear
+        $(document).on('keydown', function (e) {
+            if (e.key === 'Escape') {
+                calcInput.val('');
+                calcResult.text('');
+            }
+        });
     }
-    // console.log("Calendar Ran")
-};
 
 
 
-// NOTEPAD PLACEHOLDER QUOTES
-// function quotes(){
-//     const category = 'inspirational';``
-//     const apiKey = 'BXqEebPLbIuyRPVbj5gHjw==1XrobC1OrdwVzeT3'; // Replace with your actual API key
-//     const apiUrl = `https://api.api-ninjas.com/v1/quotes?category=${category}`;
-//     const placeholder = document.getElementById('notepad'); // Make sure you have an element with this ID
 
-//     fetch(apiUrl, {
-//         method: 'GET',
-//         headers: {
-//             'X-Api-Key': apiKey,
-//             'Content-Type': 'application/json'
-//         }
-//     })
-//     .then(response => {
-//         if (!response.ok) {
-//             throw new Error('Network response was not ok ' + response.statusText);
-//         }
-//         return response.json();
-//     })
-//     .then(data => {
-//         // console.log(data);
-//         if (data.length > 0) {
-//             placeholder.placeholder = data[0].quote + " - " + data[0].author;
-//         } else {
-//             placeholder.placeholder = "No quote found.";
-//         }
-//     })
-//     .catch(error => {
-//         console.error('Error:', error);
-//         placeholder.placeholder = "An error occurred ! - Developer.";
-//     });
-// }
+    function calendar() {
+        const $prevMonth = $('#prevMonth');
+        const $nextMonth = $('#nextMonth');
+        const $currentMonth = $('#currentMonth');
+        const $daysContainer = $('.days');
+
+        let today = new Date();
+        let currentYear = today.getFullYear();
+        let currentMonthIndex = today.getMonth();
+
+        renderCalendar(currentYear, currentMonthIndex);
+
+        $prevMonth.on('click', function () {
+            currentMonthIndex--;
+            if (currentMonthIndex < 0) {
+                currentMonthIndex = 11;
+                currentYear--;
+            }
+            renderCalendar(currentYear, currentMonthIndex);
+        });
+
+        $nextMonth.on('click', function () {
+            currentMonthIndex++;
+            if (currentMonthIndex > 11) {
+                currentMonthIndex = 0;
+                currentYear++;
+            }
+            renderCalendar(currentYear, currentMonthIndex);
+        });
+
+        function renderCalendar(year, month) {
+            $daysContainer.empty();
+            $currentMonth.text(getMonthName(month) + ' ' + year);
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                $('<div>').addClass('empty-day').appendTo($daysContainer);
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const $day = $('<div>').addClass('day').text(i);
+                if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    $day.addClass('current-date');
+                }
+                $daysContainer.append($day);
+            }
+        }
+
+        function getMonthName(index) {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            return months[index];
+        }
+        // console.log("Calendar Ran")
+    };
 
 
-todo();
-notepad();
-calculator();
-calendar();
 
-// quotes();
-console.log("widgets.js Loaded");
+    // NOTEPAD PLACEHOLDER QUOTES
+    // function quotes(){
+    //     const category = 'inspirational';``
+    //     const apiKey = ''; // Replace with your actual API key
+    //     const apiUrl = `https://api.api-ninjas.com/v1/quotes?category=${category}`;
+    //     const placeholder = document.getElementById('notepad'); // Make sure you have an element with this ID
+
+    //     fetch(apiUrl, {
+    //         method: 'GET',
+    //         headers: {
+    //             'X-Api-Key': apiKey,
+    //             'Content-Type': 'application/json'
+    //         }
+    //     })
+    //     .then(response => {
+    //         if (!response.ok) {
+    //             throw new Error('Network response was not ok ' + response.statusText);
+    //         }
+    //         return response.json();
+    //     })
+    //     .then(data => {
+    //         // console.log(data);
+    //         if (data.length > 0) {
+    //             placeholder.placeholder = data[0].quote + " - " + data[0].author;
+    //         } else {
+    //             placeholder.placeholder = "No quote found.";
+    //         }
+    //     })
+    //     .catch(error => {
+    //         console.error('Error:', error);
+    //         placeholder.placeholder = "An error occurred ! - Developer.";
+    //     });
+    // }
+
+
+    todo();
+    notepad();
+    calculator();
+    calendar();
+
+    // quotes();
+    console.log("widgets.js Loaded");
 
 })
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
     <meta charset="UTF-8">
@@ -9,6 +10,7 @@
     <link rel="stylesheet" href="res/css/widgets.css">
 
 </head>
+
 <body>
     <div id="theme-container">
 
@@ -42,13 +44,13 @@
                                 <div>Fri</div>
                                 <div>Sat</div>
                             </div>
-                            
+
                             <div class="days"></div>
                         </div>
                     </div>
                 </div>
 
-                
+
                 <div class="vertical-wrapper">
                     <div class="weather-container">
                         <div class="weather-heading">
@@ -79,12 +81,12 @@
                             <p id="location"></p>
                         </div>
                     </div>
-                    
-                    
+
+
                     <div class="calculator-container">
                         <div class="calculator-heading">
                             <img src="/res/logo/calculator.svg" alt="calculator">
-                            <p class="calc-value" id="calcResult" >= </p>
+                            <p class="calc-value" id="calcResult">= </p>
                         </div>
                         <input type="text" id="calcInput" placeholder="..." autocomplete="off">
                     </div>
@@ -103,35 +105,62 @@
                         </a> -->
                     </div>
                 </div>
-                
+
             </div>
 
             <!-- ROW 2 -->
             <div class="widget-wrapper">
                 <div class="notepad-container" id="notepadContainer">
                     <div class="notepad-heading">
-                        <img class="notepad_logo" src="../res/logo/notepad.svg" alt="notepad">
-            
-                        <div class="notepad-btn">
-                            <!-- <img src="../logo/save.svg" alt="save"  id="saveBtn"> -->
-                            <img src="../res/logo/undo.svg" alt="reset"  id="resetBtn">
-                            <img src="../res/logo/save.svg" alt="save" id="exportBtn">
+                        <img class="notepad_logo" src="res/logo/md.svg" alt="notepad">
+
+                        <div class="notepad-controls">
+                            <!-- Group 1: Split Toggle (Switch) -->
+                            <div class="control-group">
+                                <label class="switch-label" title="Toggle Split View">
+                                    <input type="checkbox" id="toggleSplitBtn">
+                                    <span class="switch-slider">
+                                        <img src="res/logo/split.svg" alt="split" class="switch-icon">
+                                    </span>
+                                </label>
+                            </div>
+
+                            <!-- Group 2: Preview Toggle -->
+                            <div class="control-group">
+                                <img src="res/logo/play.svg" id="togglePreviewBtn" alt="preview"
+                                    title="Toggle Preview Mode">
+                            </div>
+
+                            <!-- Group 3: Export Pair -->
+                            <div class="control-group paired">
+                                <img src="res/logo/save.svg" alt="save" id="exportBtn" title="Save as Text (.txt)">
+                                <div class="v-divider"></div>
+                                <img src="res/logo/md.svg" alt="export" id="exportMDBtn"
+                                    title="Export as Markdown (.md)">
+                            </div>
+
+                            <!-- Group 4: Reset -->
+                            <div class="control-group">
+                                <img src="res/logo/undo.svg" alt="reset" id="resetBtn" title="Clear Notepad">
+                            </div>
                         </div>
                     </div>
                     <div class="notepad-body">
-                        <textarea spellcheck="false" name="notepad" id="notepad" placeholder="Write your thoughts..."></textarea>
+                        <textarea spellcheck="false" name="notepad" id="notepad"
+                            placeholder="Write your thoughts... (Markdown powered)"></textarea>
+                        <div id="notepadPreview" class="notepad-preview" style="display: none;"></div>
                     </div>
                 </div>
 
 
 
                 <div class="todo-container">
-                        <div class="todo-heading">
-                            <img src="../res/logo/todo.svg" alt="todo">
-                            <img src="../res/logo/delete.png" alt="del" id="deleteAllTaskBtn">
-                        </div>
-                        <div class="todo-body">
-                            <ul>
+                    <div class="todo-heading">
+                        <img src="../res/logo/todo.svg" alt="todo">
+                        <img src="../res/logo/delete.png" alt="del" id="deleteAllTaskBtn">
+                    </div>
+                    <div class="todo-body">
+                        <ul>
                             <!-- <li> 
                                 <div class="todo-task">
                                     <span class="todo-check"></span>
@@ -140,22 +169,24 @@
                                 
                                 <img src="../res/logo/close.svg" alt="delete">
                             </li> -->
-                            </ul>
+                        </ul>
 
-                        </div>
-
-                        <div class="todo-addTaskBody">
-                            <input type="text" id="taskName" placeholder="Task Name">
-                            <img src="../res/logo/add.svg" id="addTaskBtn" alt="add">
-                        </div>
                     </div>
+
+                    <div class="todo-addTaskBody">
+                        <input type="text" id="taskName" placeholder="Task Name">
+                        <img src="../res/logo/add.svg" id="addTaskBtn" alt="add">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </body>
 
 <script src="/res/js/jquery.js"></script>
-<script src="res/js/script.js" ></script>
+<script src="res/js/script.js"></script>
 
+<script src="res/js/marked.js"></script>
 <!-- JS -->
+
 </html>
