@@ -394,12 +394,16 @@ input:checked + .switch-slider:before {
 .notepad-container.split-active {
     width: 95%;
     height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
     transition: width 0.3s ease;
 }
 
 .notepad-body.split-active {
     display: flex;
+    flex-grow: 1;
     gap: 20px;
+    height: auto !important;
 }
 
 .split-active textarea,
