@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="icon" type="image/png" href="/res/logo/icon128.png">
     <link rel="stylesheet" href="../css/main.css">
 </head>
+
 <body class="settings-body">
     <section class="settings-sidebar">
         <div>
@@ -66,7 +68,7 @@
                     <button id="setWeatherLocation" style="width:40px; height:40px; font-size:14px">&#10004;</button>
                 </div>
             </div>
-            
+
             <div class="setting">
                 <h4>Refresh QuickTab</h4>
                 <button id="refreshBtn">Refresh</button>
@@ -120,6 +122,14 @@
                         <button id="applyTheme3">Apply</button>
                     </div>
                 </div>
+
+                <div class="theme antigravity-theme">
+                    <img src="/res/theme/theme4/theme4.jpg" alt="theme">
+                    <div>
+                        <p>Theme 4</p>
+                        <button id="applyTheme4">Apply</button>
+                    </div>
+                </div>
             </div>
 
             <div class="color-picker">
@@ -150,7 +160,7 @@
                                 <span id="textColorValue">#000000</span>
                             </div>
                         </div>
-                        
+
                         <div class="color">
                             <p>Opacity</p>
                             <div>
@@ -163,15 +173,15 @@
                         <div class="color">
                             <p>Blur</p>
                             <div>
-                                <input type="range" id="blur" min="0" max="20"  step="2">
+                                <input type="range" id="blur" min="0" max="20" step="2">
                                 <span id="blurValue">5px</span>
                             </div>
                         </div>
-                        
+
                         <div class="color">
                             <p>Radius</p>
                             <div>
-                                <input type="range" id="radius" min="0" max="40"  step="5">
+                                <input type="range" id="radius" min="0" max="40" step="5">
                                 <span id="radiusValue">5px</span>
                             </div>
                         </div>
@@ -198,18 +208,20 @@
                         </div>
                         <div>
                             <h4>Use Static Wallpaper</h4>
-                            <p>Due to limitations, image uploads are not supported.  
-                            Please place your chosen wallpaper in the extension folder and rename it as <b>bg.jpg</b>.  
-                            The file must be located at <code>/bg.jpg</code> for it to work.</p>
+                            <p>Due to limitations, image uploads are not supported.
+                                Please place your chosen wallpaper in the extension folder and rename it as
+                                <b>bg.jpg</b>.
+                                The file must be located at <code>/bg.jpg</code> for it to work.
+                            </p>
                             <!-- <input type="file" id="wallpaper" accept="image/*"> -->
                             <button id="useStaticWallpaper">Set Static Wallpaper</button>
                         </div>
                     </div>
-    
+
                     <div class="wallpaper-preview">
                         <img src="/bg.jpg" alt="preview">
                     </div>
-                    
+
                 </div>
             </div>
         </section>
@@ -252,15 +264,16 @@
             </div>
                 
         </section> -->
-        
+
         <!-- ABOUT -->
         <section id="about">
             <h3>About</h3>
             <div>
                 <img src="/res/logo/quicktab.png" alt="QuickTab">
                 <div>
-                    <p>QuickTab is a minimal, customizable browser homepage designed to boost productivity and personalize your browsing experience.</p>
-                    <p>Version 1.0.1</p>
+                    <p>QuickTab is a minimal, customizable browser homepage designed to boost productivity and
+                        personalize your browsing experience.</p>
+                    <p>Version 1.0.3</p>
                     <p>Copyright &copy; <span id="year"></span> QuickTab. All rights reserved.</p>
                     <br>
                     <a href="https://github.com/muhib68442/quicktab/" target="_blank">GitHub</a>
@@ -275,4 +288,5 @@
 </body>
 <script src="/res/js/jquery.js"></script>
 <script src="/res/js/settings.js"></script>
+
 </html>

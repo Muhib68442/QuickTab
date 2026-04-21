@@ -271,6 +271,13 @@ $(document).ready(function() {
             $(this).closest(".theme").addClass("selected-theme");
             // window.location.reload(true);
         })
+        $("#applyTheme4").click(function(){
+            data.settings.theme = "theme4";
+            localStorage.setItem(key, JSON.stringify(data));
+            $(".theme").removeClass("selected-theme");
+            $(this).closest(".theme").addClass("selected-theme");
+            // window.location.reload(true);
+        })
     
         // SHOW SELECTED 
         if(data.settings.theme == "theme1"){
@@ -282,6 +289,9 @@ $(document).ready(function() {
         }else if(data.settings.theme == "theme3"){
             $(".theme").removeClass("selected-theme");
             $("#applyTheme3").closest(".theme").addClass("selected-theme");
+        }else if(data.settings.theme == "theme4"){
+            $(".theme").removeClass("selected-theme");
+            $("#applyTheme4").closest(".theme").addClass("selected-theme");
         }
     }
     theme();

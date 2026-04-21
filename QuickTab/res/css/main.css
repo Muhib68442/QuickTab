@@ -23,6 +23,7 @@
   --text-b: #000;
   --bg-primary: #dedede50;
   --bg-secondary: #81818150;
+  --bg-secondary-solid: #818181;
   --shadow: 0px 0px 80px 10px #242424;
   --blur: 5px;
   --radius: 16px;
@@ -390,8 +391,7 @@ body::-webkit-scrollbar {
   width: 350px;
   height: 200px;
   background-color: var(--bg-primary);
-  -webkit-backdrop-filter: blur(var(--blur));
-          backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
   border-radius: var(--radius);
   opacity: var(--opacity);
 }
@@ -552,11 +552,13 @@ body::-webkit-scrollbar {
   font-size: 18px;
   cursor: pointer;
   transition: 0.1s;
-  margin-bottom: 10px;
 }
 .settings-main #bookmarks div .bookmark-show-container ul li:hover {
   transition: 0.1s;
   color: #fff;
+}
+.settings-main #bookmarks div .bookmark-show-container ul li {
+  margin-bottom: 10px;
 }
 .settings-main #bookmarks div .bookmark-show-container ul li img {
   width: 20px;

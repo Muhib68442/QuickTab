@@ -7,13 +7,15 @@
     gap: 20px;
 }
 
-.widget-wrapper{
-    width : 100%;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    flex-wrap: wrap;
-    /* margin-bottom: 30px; */
+.widget-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 20px;
+  /* margin-bottom: 30px; */
+  transition: all 0.4s ease;
 }
 @media screen and (max-width: 768px){
     .widget-wrapper{
@@ -37,13 +39,14 @@
         margin-bottom: 20px;
     }
 }
-.vertical-wrapper{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    width: 30%;
+.vertical-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  width: 30%;
+  flex: 1 1 300px;
 }
     
 /* media screen for small screen */
@@ -67,15 +70,18 @@ input:-moz-placeholder, textarea:-moz-placeholder {
 
 
 /********** TO DO LIST **********/
-.todo-container{
-    min-width: 30%;
-    max-height: 440px;
+.todo-container {
+  min-width: 30%;
+  flex: 1 1 300px;
+  max-height: 440px;
 
-    background-color: var(--bg-secondary);
-    backdrop-filter: blur(var(--blur));
-    border-radius: var(--radius);
-    padding: 20px;
-    /* width: 40%; */
+  background-color: var(--bg-secondary);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 .todo-heading{
     display: flex;  
@@ -103,49 +109,78 @@ input:-moz-placeholder, textarea:-moz-placeholder {
 }
 
 
-.todo-body{
-    padding-top: 10px;
-    height: 300px !important;
-    /* scrollbar */
-    overflow-y: auto;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-}
-.todo-body ul li{
+.todo-body {
+  padding-top: 10px;
+  height: 300px !important;
+  /* scrollbar */
+  overflow-y: auto;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+
+  ul li {
     list-style: none;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
+    gap: 25px;
+    padding: 4px 10px;
+    transition: all 0.3s ease;
+    border-radius: 8px;
 
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  }
 }
-.todo-body ul li span{
-    display: block;
-    border-radius: 500px;
-    width: 20px;
-    height:20px;
-    /* padding: 10px; */
-    border: 2px solid var(--text-b) !important;
+.todo-body ul li span {
+  display: block;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--text-b) !important;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+
+  &.completed {
+    background-color: var(--theme);
+    border-color: var(--theme) !important;
+    background-image: url("../logo/check.svg");
+    background-size: 70%;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
 }
-.todo-body ul li input{
-    font-family: fontM;
-    font-size: 22px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    color: var(--text-b);
-    background-color: transparent;
-    border: none;
-    outline: none;
+
+.todo-body ul li input {
+  font-family: fontM;
+  font-size: 18px;
+  color: var(--text-b);
+  background-color: transparent;
+  border: none;
+  outline: none;
+  flex-grow: 1;
+  width: 100%;
+  cursor: pointer;
+  padding: 5px 0;
+  transition: all 0.2s ease;
+
+  &.completed {
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
 }
 .todo-body ul li img{
     width:  20px;
     height: 20px;
 }
-.todo-task{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
+.todo-task {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  flex-grow: 1;
 }
 
 .todo-addTaskBody{
@@ -197,15 +232,72 @@ input:-moz-placeholder, textarea:-moz-placeholder {
 
 /********** NOTEPAD **********/
 
-.notepad-container{
-    width: 65%;
-    /* margin: 0 auto; */
-    background-color: var(--bg-secondary);
-    backdrop-filter: blur(var(--blur));
-    border-radius: var(--radius);
-    padding: 15px;
-    /* margin-top: 10px; */
+.notepad-container {
+  width: 65%;
+  flex: 2 1 600px;
+  background-color: var(--bg-secondary);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
+  padding: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 
+  &.full-screen {
+    width: 100% !important;
+    min-height: calc(100vh - 60px) !important;
+    flex-basis: 100% !important;
+    margin: 0 !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    
+    // Maintain blur and transparency
+    background-color: var(--bg-secondary) !important;
+    backdrop-filter: blur(var(--blur)) !important;
+    
+    // Smooth entry for content
+    .notepad-body {
+      height: calc(100vh - 140px) !important;
+      opacity: 0;
+      animation: notepadContentFade 0.4s 0.2s forwards;
+      
+      textarea {
+        padding: 30px;
+        font-size: 20px;
+        height: 100% !important;
+        transition: padding 0.5s ease;
+      }
+    }
+  }
+}
+
+@keyframes notepadContentFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#widget-container.notepad-expanded {
+  .todo-container,
+  .widget-wrapper:first-of-type {
+    display: none !important;
+  }
+  
+  .widget-wrapper {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@keyframes expandNotepad {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 .notepad-heading{
     display: flex;
@@ -504,8 +596,11 @@ input:checked + .switch-slider:before {
     width: 100% ;
     background-color: var(--bg-secondary);
     backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius);
     padding: 10px 20px 20px 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 .calculator-heading{
     display: flex;
@@ -561,9 +656,12 @@ input[type=number] {
     width: 100%;
     background-color: var(--bg-secondary);
     backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius);
     padding: 15px 20px 10px 20px;
     margin-top: 10px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 .weather-heading{
     display: flex;
@@ -628,14 +726,18 @@ input[type=number] {
     /* overflow: hidden; */
     background-color: var(--bg-secondary);
     backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius);
     padding: 10px;
     min-height: 350px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 
 
 }
-.calendar-container{
-    min-width: 30%;
+.calendar-container {
+  min-width: 30%;
+  flex: 1 1 350px;
 }
 .calendar-header {
     display: flex;
@@ -724,17 +826,21 @@ input[type=number] {
 
 
 /********** BOOKAMRK **********/
-.bookmark-container{
-    width : 30%;
-    min-height: 350px;
+.bookmark-container {
+  width: 30%;
+  flex: 1 1 300px;
+  min-height: 350px;
 
     /* min-height : 50vh !important; */
     background-color: var(--bg-secondary);
     backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius);
     padding: 15px;
     margin-top: 10px;
     overflow: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 
     
 

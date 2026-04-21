@@ -21,6 +21,8 @@
         <div class="menu-page">
             <!-- ROW 1 -->
             <div class="widget-wrapper">
+
+                <!-- CALENDAR -->
                 <div class="calendar-container">
                     <div class="calendar">
                         <div class="calendar-header">
@@ -52,6 +54,8 @@
 
 
                 <div class="vertical-wrapper">
+
+                    <!-- WEATHER -->
                     <div class="weather-container">
                         <div class="weather-heading">
                             <div>
@@ -82,7 +86,7 @@
                         </div>
                     </div>
 
-
+                    <!-- CALCULATOR -->
                     <div class="calculator-container">
                         <div class="calculator-heading">
                             <img src="/res/logo/calculator.svg" alt="calculator">
@@ -92,7 +96,7 @@
                     </div>
                 </div>
 
-
+                <!-- BOOKMARK -->
                 <div class="bookmark-container">
                     <div class="bookmark-heading">
                         <img src="../res/logo/bookmark.svg" alt="bookmark">
@@ -110,6 +114,8 @@
 
             <!-- ROW 2 -->
             <div class="widget-wrapper">
+
+                <!-- NOTEPAD -->
                 <div class="notepad-container" id="notepadContainer">
                     <div class="notepad-heading">
                         <img class="notepad_logo" src="res/logo/md.svg" alt="notepad">
@@ -139,7 +145,13 @@
                                     title="Export as Markdown (.md)">
                             </div>
 
-                            <!-- Group 4: Reset -->
+                            <!-- Group 4: Full Screen -->
+                            <div class="control-group">
+                                <img src="res/logo/expand.svg" alt="full screen" id="fullScreenBtn"
+                                    title="Full Screen Mode">
+                            </div>
+
+                            <!-- Group 5: Reset -->
                             <div class="control-group">
                                 <img src="res/logo/undo.svg" alt="reset" id="resetBtn" title="Clear Notepad">
                             </div>
@@ -147,13 +159,13 @@
                     </div>
                     <div class="notepad-body">
                         <textarea spellcheck="false" name="notepad" id="notepad"
-                            placeholder="Write your thoughts... (Markdown powered)"></textarea>
+                            placeholder="Write your thoughts..."></textarea>
                         <div id="notepadPreview" class="notepad-preview" style="display: none;"></div>
                     </div>
                 </div>
 
 
-
+                <!-- TODO -->
                 <div class="todo-container">
                     <div class="todo-heading">
                         <img src="../res/logo/todo.svg" alt="todo">

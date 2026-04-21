@@ -27,6 +27,7 @@
     --text-b : #000;
     --bg-primary : #dedede50;
     --bg-secondary : #81818150;
+    --bg-secondary-solid: #818181;
     --shadow : 0px 0px 80px 10px #242424;
     --blur : 5px;
     --radius : 16px;
@@ -322,62 +323,73 @@ body::-webkit-scrollbar {
         }
 
 
-        .theme-selector-container{
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            gap : 20px;
+        .theme-selector-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 10px 0;
 
-
-            .theme{
-                width : 30%;
-                img{
-                    width : 100%;
-                    object-fit: cover;
-                    border-radius: 10px;
-                    // height : 100px;
+            .theme {
+                width: 100%;
+                background: #fff;
+                padding: 12px;
+                border: 2px solid transparent;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                
+                &:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
                 }
-                div{
+
+                img {
+                    width: 100%;
+                    border-radius: 8px;
+                    aspect-ratio: 16/9;
+                    object-fit: cover;
+                }
+
+                .theme-preview-placeholder {
+                    background: linear-gradient(135deg, #0f172a, #1e293b);
+                    border-radius: 8px;
+                    aspect-ratio: 16/9;
                     display: flex;
-                    // flex-direction: column;
                     align-items: center;
                     justify-content: center;
-                    gap : 20px;
+                    color: #fff;
+                    font-family: fontB;
+                    font-size: 32px;
+                    box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+                    
+                    &.antigravity-theme-preview {
+                       border: 2px solid #6366f1;
+                    }
+                }
 
-                    p{
-                        text-align: center;
-                        font-family: fontM;
-                        font-size: 20px;
+                div {
+                    margin-top: 15px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 15px;
+
+                    p {
+                        font-family: fontSB;
+                        font-size: 16px;
                         color: #000;
                     }
-                    button{
-                        background-color: var(--bg-secondary);
-                        border-radius: 5px;
-                        padding: 2px 20px;
-                        width : 100px;
-                        border: none;
-                        outline: none;
-                        color: #000;
-                        font-family: fontM;
-                        font-size: 18px;
-                        cursor: pointer;
-                        transition: 0.1s;
-                        &:hover{
-                            transition: 0.1s;
-                            background-color: #000;
-                            color : #fff;
-                        }
-                    }
 
+                    button {
+                        padding: 8px 15px;
+                        font-size: 14px;
+                        width: auto;
+                    }
                 }
             }
-            .selected-theme{
-                border : 4px solid var(--theme);
-                padding : 10px;
-                border-radius: 10px;
+
+            .selected-theme {
+                border-color: var(--theme);
+                background: rgba(0, 0, 0, 0.02);
             }
-
-
         }
 
         .color-picker{

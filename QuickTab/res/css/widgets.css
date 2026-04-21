@@ -10,9 +10,10 @@
 .widget-wrapper {
   width: 100%;
   display: flex;
-  justify-content: space-around;
-  align-items: center;
+  justify-content: center;
+  align-items: stretch;
   flex-wrap: wrap;
+  gap: 20px;
   /* margin-bottom: 30px; */
 }
 
@@ -45,6 +46,7 @@
   align-items: center;
   gap: 20px;
   width: 30%;
+  flex: 1 1 300px;
 }
 
 /* media screen for small screen */
@@ -68,10 +70,10 @@ input:-moz-placeholder, textarea:-moz-placeholder {
 /********** TO DO LIST **********/
 .todo-container {
   min-width: 30%;
+  flex: 1 1 300px;
   max-height: 440px;
   background-color: var(--bg-secondary);
-  -webkit-backdrop-filter: blur(var(--blur));
-          backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
   border-radius: var(--radius);
   padding: 20px;
   /* width: 40%; */
@@ -114,33 +116,55 @@ input:-moz-placeholder, textarea:-moz-placeholder {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
-
 .todo-body ul li {
   list-style: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 25px;
+  padding: 4px 10px;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+}
+.todo-body ul li:hover {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .todo-body ul li span {
   display: block;
-  border-radius: 500px;
-  width: 20px;
-  height: 20px;
-  /* padding: 10px; */
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
   border: 2px solid var(--text-b) !important;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+.todo-body ul li span.completed {
+  background-color: var(--theme);
+  border-color: var(--theme) !important;
+  background-image: url("../logo/check.svg");
+  background-size: 70%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .todo-body ul li input {
   font-family: fontM;
-  font-size: 22px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  font-size: 18px;
   color: var(--text-b);
   background-color: transparent;
   border: none;
   outline: none;
+  flex-grow: 1;
+  width: 100%;
+  cursor: pointer;
+  padding: 5px 0;
+  transition: all 0.2s ease;
+}
+.todo-body ul li input.completed {
+  text-decoration: line-through;
+  opacity: 0.5;
 }
 
 .todo-body ul li img {
@@ -150,9 +174,11 @@ input:-moz-placeholder, textarea:-moz-placeholder {
 
 .todo-task {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  gap: 20px;
+  gap: 15px;
+  width: 100%;
+  flex-grow: 1;
 }
 
 .todo-addTaskBody {
@@ -164,8 +190,7 @@ input:-moz-placeholder, textarea:-moz-placeholder {
 
 .todo-addTaskBody input {
   background-color: var(--bg-secondary);
-  -webkit-backdrop-filter: blur(var(--blur));
-          backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
   border-radius: var(--radius);
   width: 90%;
   padding: 10px 20px;
@@ -203,15 +228,52 @@ input:-moz-placeholder, textarea:-moz-placeholder {
 /********** NOTEPAD **********/
 .notepad-container {
   width: 65%;
+  flex: 2 1 600px;
   /* margin: 0 auto; */
   background-color: var(--bg-secondary);
-  -webkit-backdrop-filter: blur(var(--blur));
-          backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
   border-radius: var(--radius);
   padding: 15px;
   /* margin-top: 10px; */
+  transition: all 0.3s ease;
+}
+.notepad-container.full-screen {
+  width: 100% !important;
+  min-height: calc(100vh - 40px) !important;
+  flex-basis: 100% !important;
+  margin: 0 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  background-color: var(--bg-secondary) !important;
+  backdrop-filter: blur(var(--blur)) !important;
+}
+.notepad-container.full-screen .notepad-body {
+  height: calc(100vh - 120px) !important;
+}
+.notepad-container.full-screen .notepad-body textarea {
+  padding: 20px;
+  font-size: 20px;
+  height: 100% !important;
 }
 
+#widget-container.notepad-expanded .todo-container,
+#widget-container.notepad-expanded .widget-wrapper:first-of-type {
+  display: none !important;
+}
+#widget-container.notepad-expanded .widget-wrapper {
+  justify-content: center;
+  width: 100%;
+}
+
+@keyframes expandNotepad {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 .notepad-heading {
   display: flex;
   justify-content: space-between;
@@ -499,8 +561,7 @@ input:checked + .switch-slider:before {
 .calculator-container {
   width: 100%;
   background-color: var(--bg-secondary);
-  -webkit-backdrop-filter: blur(var(--blur));
-          backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
   border-radius: var(--radius);
   padding: 10px 20px 20px 20px;
 }
@@ -564,8 +625,7 @@ input[type=number] {
           user-select: none;
   width: 100%;
   background-color: var(--bg-secondary);
-  -webkit-backdrop-filter: blur(var(--blur));
-          backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
   border-radius: var(--radius);
   padding: 15px 20px 10px 20px;
   margin-top: 10px;
@@ -636,8 +696,7 @@ input[type=number] {
 .calendar {
   /* overflow: hidden; */
   background-color: var(--bg-secondary);
-  -webkit-backdrop-filter: blur(var(--blur));
-          backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
   border-radius: var(--radius);
   padding: 10px;
   min-height: 350px !important;
@@ -645,6 +704,7 @@ input[type=number] {
 
 .calendar-container {
   min-width: 30%;
+  flex: 1 1 350px;
 }
 
 .calendar-header {
@@ -742,11 +802,11 @@ input[type=number] {
 /********** BOOKAMRK **********/
 .bookmark-container {
   width: 30%;
+  flex: 1 1 300px;
   min-height: 350px;
   /* min-height : 50vh !important; */
   background-color: var(--bg-secondary);
-  -webkit-backdrop-filter: blur(var(--blur));
-          backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
   border-radius: var(--radius);
   padding: 15px;
   margin-top: 10px;

@@ -374,9 +374,25 @@ $(document).ready(function () {
             }
         });
 
+        // Click to Copy 
+        $('.todo-body ul').on('click', '.taskName', function (e) {
+            // Only copy if not in edit mode (readonly is true)
+            if ($(this).attr('readonly')) {
+                const text = $(this).val();
+                navigator.clipboard.writeText(text).then(() => {
+                    const $li = $(this).closest('li');
+                    $li.css('background-color', 'rgba(255, 255, 255, 0.2)');
+                    setTimeout(() => {
+                        $li.css('background-color', '');
+                    }, 200);
+                });
+            }
+        });
+
         // EDIT TASK 
         $(".todo-body ul").on("dblclick", ".taskName", function () {
             $(this).attr("readonly", false);
+            $(this).focus();
         });
         $(".todo-body ul").on("blur", ".taskName", function () {
             $(this).attr("readonly", true);
@@ -399,7 +415,6 @@ $(document).ready(function () {
 
 
     ////////// NOTEPAD //////////
-    ////////// NOTEPAD //////////
     function notepad() {
         const $notepad = $('#notepad');
         const $notepadPreview = $('#notepadPreview');
@@ -408,6 +423,7 @@ $(document).ready(function () {
         const $exportMDBtn = $('#exportMDBtn');
         const $togglePreviewBtn = $('#togglePreviewBtn');
         const $toggleSplitBtn = $('#toggleSplitBtn');
+        const $fullScreenBtn = $('#fullScreenBtn');
         const $notepadContainer = $('.notepad-container');
         const $notepadBody = $('.notepad-body');
 
@@ -418,16 +434,35 @@ $(document).ready(function () {
 
         let isSplit = false;
         let isPreview = false;
+        let isFullScreen = false;
 
         // Autosave on input & Realtime Preview
         $notepad.on('input', function () {
             data.notepad.content = $notepad.val();
             localStorage.setItem(key, JSON.stringify(data));
 
-            if (isSplit) {
+            if (isSplit || isPreview) {
                 const markdownText = $notepad.val();
                 const htmlContent = marked.parse(markdownText);
                 $notepadPreview.html(htmlContent);
+            }
+        });
+
+        // Toggle Full Screen
+        $fullScreenBtn.on('click', function () {
+            isFullScreen = !isFullScreen;
+            const $widgetContainer = $('#widget-container');
+
+            $notepadContainer.toggleClass('full-screen');
+            $notepadBody.toggleClass('full-screen');
+            $widgetContainer.toggleClass('notepad-expanded');
+
+            if (isFullScreen) {
+                window.scrollTo(0, document.body.scrollHeight);
+                $(this).attr('src', 'res/logo/compress.svg');
+            } else {
+                window.scrollTo(0, document.body.scrollHeight);
+                $(this).attr('src', 'res/logo/expand.svg');
             }
         });
 
