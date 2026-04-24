@@ -34,6 +34,36 @@
     --opacity : 100%;
     --theme : #1176ff;
 }
+
+@keyframes globalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: globalFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes globalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: globalFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 body{
 
     // BG IS DYNAMICALLY SET

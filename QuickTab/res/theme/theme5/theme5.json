@@ -1,0 +1,19 @@
+{
+    "blobCount": 4,
+    "speed": 0.5,
+    "blobSize": 400,
+    "colors": [
+        "#2986cc",
+        "#00d4ff",
+        "#7928ca",
+        "#ff0080"
+    ],
+    "background": "#02040a",
+    "bgGradientColors": [
+        "#02040a",
+        "#050b1a",
+        "#011627"
+    ],
+    "animateBackground": true,
+    "bgRotationSpeed": 0.001
+}

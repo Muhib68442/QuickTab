@@ -1,0 +1,219 @@
+<style>
+    :root {
+        --blob-color-1: #ff0080;
+        --blob-color-2: #7928ca;
+        --blob-color-3: #4200ff;
+        --blob-color-4: #00c2ff;
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --text-color: #ffffff;
+    }
+
+    #theme5-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        background: #02040a;
+        font-family: 'Outfit', 'Inter', sans-serif;
+        color: #fff;
+    }
+
+    #canvas-blobs {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        /* The 'Goo' effect will be handled in JS or via a wrapper if preferred, 
+           but we'll start with high-quality soft blobs here. */
+        filter: blur(60px);
+        opacity: 0.7;
+    }
+
+    .glass-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.5) 100%);
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    #theme5-main {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 80px;
+        box-sizing: border-box;
+        pointer-events: none;
+    }
+
+    .bottom-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        width: 100%;
+        gap: 30px;
+        pointer-events: auto;
+    }
+
+    .controls-group {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-grow: 1;
+        max-width: 650px;
+    }
+
+    .time-container {
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        flex-shrink: 0;
+    }
+
+    #time {
+        font-size: 130px;
+        font-weight: 800;
+        line-height: 0.85;
+        margin: 0;
+        letter-spacing: -6px;
+        background: linear-gradient(to bottom, #fff, #999);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+    }
+
+    #date {
+        font-size: 22px;
+        font-weight: 300;
+        color: rgba(255,255,255,0.5);
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        margin-left: 8px;
+    }
+
+    .search-container {
+        flex-grow: 1;
+    }
+
+    .searchbar {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 16px 28px;
+        backdrop-filter: blur(30px) saturate(180%);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2), 
+                    inset 0 0 20px rgba(255,255,255,0.02);
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .searchbar:focus-within {
+        background: rgba(255, 255, 255, 0.07);
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px rgba(0,0,0,0.4), 
+                    inset 0 0 30px rgba(255,255,255,0.05);
+    }
+
+    .searchbar img {
+        width: 20px;
+        height: 20px;
+        opacity: 0.4;
+        margin-right: 20px;
+        filter: brightness(2);
+    }
+
+    .searchbar input {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: #fff;
+        font-size: 18px;
+        width: 100%;
+        font-family: inherit;
+        letter-spacing: 0.8px;
+        font-weight: 300;
+    }
+
+    .searchbar input::placeholder {
+        color: rgba(255,255,255,0.3);
+    }
+
+    #settings-btn {
+        width: 58px;
+        height: 58px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.4s;
+        backdrop-filter: blur(20px);
+        flex-shrink: 0;
+    }
+
+    #settings-btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-5px) rotate(45deg);
+        border-color: rgba(255,255,255,0.3);
+    }
+
+    #settings-btn img {
+        width: 24px;
+        filter: invert(1);
+        opacity: 0.5;
+    }
+
+    @media (max-width: 1000px) {
+        #theme5-main { padding: 40px; }
+        .bottom-section {
+            flex-direction: column-reverse;
+            align-items: flex-start;
+            gap: 30px;
+        }
+        #time { font-size: 90px; }
+        .controls-group { width: 100%; max-width: 100%; }
+    }
+</style>
+
+<div id="theme5-container">
+    <canvas id="canvas-blobs"></canvas>
+    <div class="glass-overlay"></div>
+
+    <main id="theme5-main">
+        <div class="bottom-section">
+            <div class="controls-group">
+                <div id="settings-btn" title="Settings">
+                    <img src="/res/logo/settings.svg" alt="settings">
+                </div>
+                <div class="search-container">
+                    <div class="searchbar">
+                        <img src="/res/logo/search.svg" alt="search">
+                        <input type="text" placeholder="Explore something new..." spellcheck="false">
+                    </div>
+                </div>
+            </div>
+
+            <div class="time-container">
+                <p id="time">00:00</p>
+                <p id="date">Friday, January 1</p>
+            </div>
+        </div>
+    </main>
+</div>

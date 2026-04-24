@@ -68,12 +68,16 @@ $(document).ready(function () {
     });
 
     // LOAD WALLPAPER 
-    let isDynamic = data.settings.wallpaper == "dynamic" ? true : false;
-    if (isDynamic) {
-        $("body").css("background-image", "url(https://picsum.photos/1920/1080)");
+    if (selectedTheme !== "theme5") {
+        let isDynamic = data.settings.wallpaper == "dynamic" ? true : false;
+        if (isDynamic) {
+            $("body").css("background-image", "url(https://picsum.photos/1920/1080)");
+        } else {
+            let link = "/bg.jpg";
+            $("body").css("background-image", "url(" + link + ")");
+        }
     } else {
-        let link = "/bg.jpg";
-        $("body").css("background-image", "url(" + link + ")");
+        $("body").css("background-image", "none");
     }
 
 
@@ -216,9 +220,147 @@ $(document).ready(function () {
 
         console.log("Theme JS Loaded");
 
+        // Add smooth transition to UI elements
+        $("#time, #date, .searchbar").css("opacity", "0").addClass("fade-in");
+
         $(document).ready(function () {
             $(".searchbar input").focus();
         });
+
+        // THEME 5 BLOBS - PREMIUM EDITION
+        if (selectedTheme === "theme5") {
+            const canvas = document.getElementById('canvas-blobs');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                let width, height;
+                let blobs = [];
+                let config = {
+                    blobCount: 4,
+                    speed: 0.8,
+                    blobSize: 350,
+                    colors: ['#2986cc', '#00d4ff', '#7928ca', '#ff0080'],
+                    background: "#02040a",
+                    bgGradientColors: ["#02040a", "#050b1a", "#011627"],
+                    animateBackground: true,
+                    bgRotationSpeed: 0.002
+                };
+
+                // Use the configured blue or defaults
+                $.getJSON("/res/theme/theme5/theme5.json", function (ext) {
+                    config = Object.assign(config, ext);
+                    $("#theme5-container").css("background", config.background);
+                });
+
+                let mouse = { x: -1000, y: -1000 };
+                let bgTime = 0;
+
+                class Blob {
+                    constructor(color) {
+                        this.color = color;
+                        this.init();
+                    }
+
+                    init() {
+                        this.x = Math.random() * width;
+                        this.y = Math.random() * height;
+                        this.radius = Math.random() * 150 + config.blobSize;
+                        this.vx = (Math.random() - 0.5) * config.speed;
+                        this.vy = (Math.random() - 0.5) * config.speed;
+                        this.angle = Math.random() * Math.PI * 2;
+                    }
+
+                    update() {
+                        // Organic Wandering
+                        this.angle += (Math.random() - 0.5) * 0.1;
+                        this.vx += Math.cos(this.angle) * 0.05 * config.speed;
+                        this.vy += Math.sin(this.angle) * 0.05 * config.speed;
+
+                        // Subtle Mouse Attraction
+                        const dx = mouse.x - this.x;
+                        const dy = mouse.y - this.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 800) {
+                            this.vx += dx * 0.0001;
+                            this.vy += dy * 0.0001;
+                        }
+
+                        // Hard friction to keep it slow and premium
+                        this.vx *= 0.98;
+                        this.vy *= 0.98;
+
+                        this.x += this.vx;
+                        this.y += this.vy;
+
+                        // Wrap around edges
+                        const m = this.radius;
+                        if (this.x < -m) this.x = width + m;
+                        if (this.x > width + m) this.x = -m;
+                        if (this.y < -m) this.y = height + m;
+                        if (this.y > height + m) this.y = -m;
+                    }
+
+                    draw() {
+                        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+                        gradient.addColorStop(0, this.color);
+                        gradient.addColorStop(0.5, this.color + "44");
+                        gradient.addColorStop(1, 'transparent');
+
+                        ctx.fillStyle = gradient;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                function resize() {
+                    width = canvas.width = window.innerWidth;
+                    height = canvas.height = window.innerHeight;
+                }
+
+                function animate() {
+                    ctx.clearRect(0, 0, width, height);
+
+                    if (config.animateBackground) {
+                        bgTime += config.bgRotationSpeed;
+                        const x = 50 + Math.cos(bgTime) * 15;
+                        const y = 50 + Math.sin(bgTime * 0.8) * 15;
+                        const bgColors = config.bgGradientColors;
+                        const gradientStr = `radial-gradient(circle at ${x}% ${y}%, ${bgColors[2]}, ${bgColors[1]}, ${bgColors[0]})`;
+                        $("#theme5-container").css("background", gradientStr);
+                    }
+
+                    ctx.globalCompositeOperation = 'screen';
+                    blobs.forEach(blob => {
+                        blob.update();
+                        blob.draw();
+                    });
+                    ctx.globalCompositeOperation = 'source-over';
+
+                    requestAnimationFrame(animate);
+                }
+
+                window.addEventListener('resize', resize);
+                window.addEventListener('mousemove', (e) => {
+                    mouse.x = e.pageX;
+                    mouse.y = e.pageY;
+                });
+
+                resize();
+                for (let i = 0; i < config.blobCount; i++) {
+                    blobs.push(new Blob(config.colors[i % config.colors.length]));
+                }
+                animate();
+            }
+
+            $("#settings-btn").click(function () {
+                window.location.href = "/res/theme/settings.html";
+            });
+        }
+
+        $("#settings-btn").click(function () {
+            window.location.href = "/res/theme/settings.html";
+        });
+
 
     }
 

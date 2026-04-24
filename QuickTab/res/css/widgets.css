@@ -15,6 +15,7 @@
   flex-wrap: wrap;
   gap: 20px;
   /* margin-bottom: 30px; */
+  transition: all 0.4s ease;
 }
 
 @media screen and (max-width: 768px) {
@@ -74,9 +75,11 @@ input:-moz-placeholder, textarea:-moz-placeholder {
   max-height: 440px;
   background-color: var(--bg-secondary);
   backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius);
   padding: 20px;
-  /* width: 40%; */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .todo-heading {
@@ -229,32 +232,47 @@ input:-moz-placeholder, textarea:-moz-placeholder {
 .notepad-container {
   width: 65%;
   flex: 2 1 600px;
-  /* margin: 0 auto; */
   background-color: var(--bg-secondary);
   backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius);
   padding: 15px;
-  /* margin-top: 10px; */
-  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
 .notepad-container.full-screen {
   width: 100% !important;
-  min-height: calc(100vh - 40px) !important;
+  min-height: calc(100vh - 60px) !important;
   flex-basis: 100% !important;
   margin: 0 !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
   background-color: var(--bg-secondary) !important;
   backdrop-filter: blur(var(--blur)) !important;
 }
 .notepad-container.full-screen .notepad-body {
-  height: calc(100vh - 120px) !important;
+  height: calc(100vh - 140px) !important;
+  opacity: 0;
+  animation: notepadContentFade 0.4s 0.2s forwards;
 }
 .notepad-container.full-screen .notepad-body textarea {
-  padding: 20px;
+  padding: 30px;
   font-size: 20px;
   height: 100% !important;
+  transition: padding 0.5s ease;
 }
 
+@keyframes notepadContentFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 #widget-container.notepad-expanded .todo-container,
 #widget-container.notepad-expanded .widget-wrapper:first-of-type {
   display: none !important;
@@ -562,8 +580,11 @@ input:checked + .switch-slider:before {
   width: 100%;
   background-color: var(--bg-secondary);
   backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius);
   padding: 10px 20px 20px 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .calculator-heading {
@@ -626,9 +647,12 @@ input[type=number] {
   width: 100%;
   background-color: var(--bg-secondary);
   backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius);
   padding: 15px 20px 10px 20px;
   margin-top: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .weather-heading {
@@ -697,9 +721,12 @@ input[type=number] {
   /* overflow: hidden; */
   background-color: var(--bg-secondary);
   backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius);
   padding: 10px;
   min-height: 350px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .calendar-container {
@@ -807,10 +834,13 @@ input[type=number] {
   /* min-height : 50vh !important; */
   background-color: var(--bg-secondary);
   backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius);
   padding: 15px;
   margin-top: 10px;
   overflow: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .bookmark-container::-webkit-scrollbar {

@@ -4,3 +4,9 @@
 - Theme 5 (https://dribbble.com/shots/2261378-Tabtics-Chrome-Extension)
 - Theme 6 (https://dribbble.com/shots/20557175-New-tab-Chrome-Extension-UI)
 - 
+
+# Advance Upgrades
+- Voice Meter 
+- Record Audio
+- Music Player
+- 
