@@ -96,19 +96,58 @@
                     </div>
                 </div>
 
-                <!-- BOOKMARK -->
-                <div class="bookmark-container">
-                    <div class="bookmark-heading">
-                        <img src="../res/logo/bookmark.svg" alt="bookmark">
-                        <img src="../res/logo/add.svg" id="manageBookmarkBtn" alt="manage">
+                <div class="vertical-wrapper">
+
+                    <!-- MEDIA CONTROLLER -->
+                    <div class="media-controller-container">
+                        <div class="media-header">
+                            <img src="res/logo/media/play.svg" alt="icon">
+                            <span id="mediaTitle">YouTube Player</span>
+                        </div>
+                        <div class="media-controls">
+                            <!-- Play/Pause -->
+                            <button class="action-btn" id="playPauseBtn" title="Play">
+                                <img id="playPauseIcon" src="res/logo/media/play.svg" alt="play">
+                            </button>
+
+                            <!-- Prev -->
+                            <button class="action-btn" id="prevBtn" title="Previous">
+                                <img src="res/logo/media/prev.svg" alt="previous">
+                            </button>
+
+                            <!-- Time and Seek -->
+                            <div class="time-container">
+                                <span class="time-current" id="timeCurrent">0:00</span>
+                                <div class="progress-container" id="progressContainer">
+                                    <div class="progress-bar" id="progressBar"></div>
+                                    <div class="progress-scrubber" id="progressScrubber"></div>
+                                </div>
+                                <span class="time-duration" id="timeDuration">0:00</span>
+                            </div>
+
+                            <!-- Next -->
+                            <button class="action-btn" id="nextBtn" title="Next">
+                                <img src="res/logo/media/next.svg" alt="next">
+                            </button>
+                        </div>
                     </div>
-                    <div id="bookmark-body">
-                        <!-- <a class="bookmark-option">
-                            <img src="https://www.google.com/s2/favicons?domain=facebook.com&size=128" alt="">
-                            <p class="bookmark-value">Facebook</p>
-                        </a> -->
+
+                    <!-- BOOKMARK -->
+                    <div class="bookmark-container">
+                        <div class="bookmark-heading">
+                            <img src="../res/logo/bookmark.svg" alt="bookmark">
+                            <img src="../res/logo/add.svg" id="manageBookmarkBtn" alt="manage">
+                        </div>
+                        <div id="bookmark-body">
+                            <!-- <a class="bookmark-option">
+                                <img src="https://www.google.com/s2/favicons?domain=facebook.com&size=128" alt="">
+                                <p class="bookmark-value">Facebook</p>
+                            </a> -->
+                        </div>
                     </div>
+
                 </div>
+
 
             </div>
 

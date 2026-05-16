@@ -893,11 +893,116 @@ $(document).ready(function () {
     //     });
     // }
 
+    function initMediaController() {
+
+        // CONTROLS
+        const playPauseBtn = document.getElementById("playPauseBtn");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        const timeCurrent = document.getElementById("timeCurrent");
+        const timeDuration = document.getElementById("timeDuration");
+
+        const progressBar = document.getElementById("progressBar");
+        const progressScrubber = document.getElementById("progressScrubber");
+
+        const playPauseIcon = document.getElementById("playPauseIcon");
+
+        let isPlaying = true;
+
+        // SEND COMMANDS TO BACKGROUND
+        function sendAction(action, value = null) {
+            if (chrome.runtime?.id) {
+                chrome.runtime.sendMessage({
+                    type: "MEDIA_CONTROL",
+                    action: action,
+                    value: value
+                }).catch(err => {
+                    console.warn("Background script not ready.");
+                });
+            }
+        }
+
+        // PLAY / PAUSE
+        playPauseBtn.addEventListener("click", () => {
+            sendAction("togglePlay");
+        });
+
+        // PREV
+        prevBtn.addEventListener("click", () => {
+            sendAction("prev");
+        });
+
+        // NEXT
+        nextBtn.addEventListener("click", () => {
+            sendAction("next");
+        });
+
+
+        // RECEIVE updates from YouTube tab
+        chrome.runtime.onMessage.addListener((msg) => {
+
+            if (msg.type === "MEDIA_UPDATE") {
+
+                let current = msg.currentTime || 0;
+                let duration = msg.duration || 0;
+                let paused = msg.paused;
+                let title = msg.title || "YouTube Player";
+
+                // TITLE
+                document.getElementById("mediaTitle").innerText = title;
+
+                // TIME
+                timeCurrent.innerText = formatTime(current);
+                timeDuration.innerText = formatTime(duration);
+
+                // PROGRESS BAR
+                let percent = duration ? (current / duration) * 100 : 0;
+
+                progressBar.style.width = percent + "%";
+                progressScrubber.style.left = percent + "%";
+
+                // PLAY/PAUSE ICON SYNC
+                if (paused) {
+                    playPauseIcon.src = "res/logo/media/play.svg";
+                    playPauseBtn.title = "Play";
+                    isPlaying = false;
+                } else {
+                    playPauseIcon.src = "res/logo/media/pause.svg";
+                    playPauseBtn.title = "Pause";
+                    isPlaying = true;
+                }
+            }
+
+        });
+
+        // SEEKING
+        const progressContainer = document.getElementById("progressContainer");
+        progressContainer.addEventListener("click", (e) => {
+            const rect = progressContainer.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            sendAction("seek", pos);
+        });
+
+    }
+
+    function formatTime(sec) {
+        if (!sec || isNaN(sec)) return "0:00";
+
+        let m = Math.floor(sec / 60);
+        let s = Math.floor(sec % 60);
+
+        return `${m}:${s < 10 ? "0" + s : s}`;
+    }
+
+    // 🚀 auto init
+    // document.addEventListener("DOMContentLoaded", initMediaController);
 
     todo();
     notepad();
     calculator();
     calendar();
+    initMediaController();
 
     // quotes();
     console.log("widgets.js Loaded");

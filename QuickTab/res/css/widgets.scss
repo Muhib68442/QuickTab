@@ -43,10 +43,18 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
   gap: 20px;
   width: 30%;
   flex: 1 1 300px;
+
+  & > div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+  }
 }
     
 /* media screen for small screen */
@@ -827,9 +835,10 @@ input[type=number] {
 
 /********** BOOKAMRK **********/
 .bookmark-container {
-  width: 30%;
-  flex: 1 1 300px;
-  min-height: 350px;
+//   width: 30%;
+    min-width: 100%;
+    flex: 1 1 300px;
+    min-height: 250px;
 
     /* min-height : 50vh !important; */
     background-color: var(--bg-secondary);
@@ -838,12 +847,10 @@ input[type=number] {
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius);
     padding: 15px;
-    margin-top: 10px;
+    // margin-top: 10px;
     overflow: auto;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-
-    
-
+    justify-content: flex-start !important;
 }
 .bookmark-container::-webkit-scrollbar {
     width: 5px;
@@ -928,3 +935,143 @@ input[type=number] {
         transition: 0.1s;
     }
 }
+
+
+
+// MEDIA CONTROLLER 
+
+// -----------------------------
+// [PLAY/PAUSE] [PREV] 1:30 --0---------- 3:45 [NEXT]
+// -----------------------------
+
+.media-controller-container {
+    min-width: 100%;
+    background-color: var(--bg-secondary);
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius);
+    padding: 15px;
+    margin-top: 10px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .media-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+        img {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        span {
+            font-family: fontM;
+            font-size: 13px;
+            color: var(--text-b);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            opacity: 0.9;
+        }
+    }
+
+    .media-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background: var(--theme);
+                border-color: var(--theme);
+                transform: scale(1.1);
+                img { opacity: 1; }
+            }
+
+            img {
+                width: 14px;
+                height: 14px;
+                opacity: 0.8;
+                transition: opacity 0.2s;
+            }
+        }
+
+        .time-container {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 0; // Prevent overflow issues
+
+            .time-current, .time-duration {
+                font-family: fontM;
+                font-size: 11px;
+                color: var(--text-b);
+                min-width: 32px;
+                opacity: 0.7;
+                text-align: center;
+                white-space: nowrap;
+            }
+
+            .progress-container {
+                position: relative;
+                height: 8px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 10px;
+                flex: 1;
+                cursor: pointer;
+                overflow: visible;
+                margin: 0 5px;
+
+                .progress-bar {
+                    height: 100%;
+                    background: var(--theme);
+                    border-radius: 10px;
+                    width: 0%;
+                    box-shadow: 0 0 8px var(--theme);
+                }
+
+                .progress-scrubber {
+                    position: absolute;
+                    top: 50%;
+                    left: 0%;
+                    width: 10px;
+                    height: 10px;
+                    background: #fff;
+                    border-radius: 50%;
+                    transform: translate(-50%, -50%);
+                    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+                    pointer-events: none;
+                    opacity: 0;
+                    transition: opacity 0.2s;
+                }
+
+                &:hover .progress-scrubber {
+                    opacity: 1;
+                }
+            }
+        }
+    }
+}
+
+
+
+

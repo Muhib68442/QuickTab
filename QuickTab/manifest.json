@@ -2,20 +2,39 @@
   "manifest_version": 3,
   "name": "QuickTab",
   "description": "Quick tab",
-  "version": "1.0.1",
-
+  "version": "1.0.3",
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
-
-  "permissions": [],
-
+  "permissions": [
+    "tabs",
+    "scripting",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "*://www.youtube.com/*",
+    "*://*.youtube.com/*",
+    "*://music.youtube.com/*"
+  ],
+  "background": {
+    "service_worker": "res/js/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://www.youtube.com/*",
+        "*://music.youtube.com/*"
+      ],
+      "js": [
+        "res/js/youtube.js"
+      ]
+    }
+  ],
   "icons": {
     "16": "res/logo/icon16.png",
     "48": "res/logo/icon48.png",
     "128": "res/logo/icon128.png"
   },
-
   "web_accessible_resources": [
     {
       "resources": [
@@ -23,8 +42,9 @@
         "res/theme/*",
         "res/logo/*"
       ],
-      "matches": ["<all_urls>"]
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ]
-
 }
