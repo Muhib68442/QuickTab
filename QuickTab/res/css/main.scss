@@ -365,6 +365,8 @@ body::-webkit-scrollbar {
                 padding: 12px;
                 border: 2px solid transparent;
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                cursor: pointer;
+                border-radius: 8px;
                 
                 &:hover {
                     transform: translateY(-5px);
@@ -412,12 +414,23 @@ body::-webkit-scrollbar {
                         padding: 8px 15px;
                         font-size: 14px;
                         width: auto;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        border: 0.5px solid black;
+                        transition: 0.2s;
+
+                        &:hover{
+                            background-color: black;
+                            color: #fff;
+                            transition: 0.2s;
+                        }
                     }
                 }
             }
 
             .selected-theme {
                 border-color: var(--theme);
+                border-width: 2px;
                 background: rgba(0, 0, 0, 0.02);
             }
         }

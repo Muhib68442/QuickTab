@@ -85,7 +85,7 @@ $(document).ready(function () {
     function weather() {
 
         function fetchWeatherData() {
-            const apiKey = '0d4fa78962b1bff5497c512a23db006d';
+            const apiKey = QUICKTAB_CONFIG.WEATHER_API_KEY;
             // fetch location from localstorage 
             const location = data.settings.weatherLocation;
             const apiUrl = 'https://api.openweathermap.org/data/2.5/weather?q=' + location + '&units=metric&appid=' + apiKey;
@@ -223,9 +223,7 @@ $(document).ready(function () {
         // Add smooth transition to UI elements
         $("#time, #date, .searchbar").css("opacity", "0").addClass("fade-in");
 
-        $(document).ready(function () {
-            $(".searchbar input").focus();
-        });
+        // Don't auto-focus the searchbar — keeps address bar blank like Chrome's default new tab
 
         // THEME 5 BLOBS - PREMIUM EDITION
         if (selectedTheme === "theme5") {
