@@ -1074,4 +1074,68 @@ input[type=number] {
 
 
 
+/// =====================================================
+// FLUENT DESIGN — REVEAL BORDER GLOW
+// The ::before has a full radial gradient, but a CSS mask
+// cuts it down to just the 1px border rim — so only the
+// border lights up near the cursor, not the background.
+// =====================================================
 
+.todo-container,
+.notepad-container,
+.calculator-container,
+.weather-container,
+.calendar,
+.bookmark-container,
+.media-controller-container {
+    isolation: isolate;
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+
+        // Full radial gradient — only the border rim will show through the mask
+        background: radial-gradient(
+            200px circle at var(--x, 50%) var(--y, 50%),
+            rgba(255, 255, 255, 0.9),
+            transparent 80%
+        );
+
+        // Slightly background glow
+        &::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+
+            background: radial-gradient(
+                200px circle at var(--x, 50%) var(--y, 50%),
+                rgba(255, 255, 255, 0.2),
+                transparent 80%
+            );
+        }
+
+        // Mask: outer shape minus inner content-box = 1px border ring only
+        padding: 1px;
+        -webkit-mask:
+            linear-gradient(#fff 0 0) content-box,
+            linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask:
+            linear-gradient(#fff 0 0) content-box,
+            linear-gradient(#fff 0 0);
+        mask-composite: exclude;
+    }
+
+    &:hover::before {
+        opacity: 1;
+    }
+}

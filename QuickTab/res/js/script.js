@@ -1009,3 +1009,34 @@ $(document).ready(function () {
 
 
 
+// =====================================================
+// FLUENT DESIGN — REVEAL HIGHLIGHT EFFECT
+// Updates --x and --y on each widget so the SCSS
+// radial-gradient glow tracks the cursor position.
+// =====================================================
+
+function initRevealEffect() {
+
+    const CARDS = [
+        ".todo-container",
+        ".notepad-container",
+        ".calculator-container",
+        ".weather-container",
+        ".calendar",
+        ".bookmark-container",
+        ".media-controller-container",
+    ];
+
+    document.querySelectorAll(CARDS.join(", ")).forEach(card => {
+        card.addEventListener("mousemove", (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width)  * 100;
+            const y = ((e.clientY - rect.top)  / rect.height) * 100;
+            card.style.setProperty("--x", `${x}%`);
+            card.style.setProperty("--y", `${y}%`);
+        });
+    });
+}
+
+// Scripts load at the bottom of <body> — DOM is already parsed.
+$(document).ready(initRevealEffect);
