@@ -223,9 +223,7 @@ $(document).ready(function () {
         // Add smooth transition to UI elements
         $("#time, #date, .searchbar").css("opacity", "0").addClass("fade-in");
 
-        $(document).ready(function () {
-            $(".searchbar input").focus();
-        });
+        // Don't auto-focus the searchbar — keeps address bar blank like Chrome's default new tab
 
         // THEME 5 BLOBS - PREMIUM EDITION
         if (selectedTheme === "theme5") {
