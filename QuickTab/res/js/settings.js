@@ -46,7 +46,10 @@ $(document).ready(function() {
             ],
 
             "notepad": {
-                "content": "Welcome to QuickTab!"
+                "tabs": [
+                    { "id": "nt_1", "name": "Tab 1", "content": "Welcome to QuickTab!" }
+                ],
+                "activeTab": "nt_1"
             }
         }
         localStorage.setItem(key, JSON.stringify(value));

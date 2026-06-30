@@ -157,9 +157,19 @@
                 <!-- NOTEPAD -->
                 <div class="notepad-container" id="notepadContainer">
                     <div class="notepad-heading">
-                        <img class="notepad_logo" src="res/logo/md.svg" alt="notepad">
+                        <img class="notepad_logo" src="res/logo/notepad.svg" alt="notepad">
+
+                        <div class="notepad-tabs">
+                            <div class="notepad-tabs-list" id="notepadTabsList"></div>
+                            <button class="tab-add-btn" id="tabAddBtn" title="Add Tab">+</button>
+                        </div>
 
                         <div class="notepad-controls">
+                            <!-- Group 0: Sync -->
+                            <div class="control-group">
+                                <img src="res/logo/sync.svg" id="syncBtn" alt="sync" title="Save to localStorage">
+                            </div>
+
                             <!-- Group 1: Split Toggle (Switch) -->
                             <div class="control-group">
                                 <label class="switch-label" title="Toggle Split View">

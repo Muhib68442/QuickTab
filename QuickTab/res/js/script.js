@@ -45,7 +45,10 @@ $(document).ready(function () {
             ],
 
             "notepad": {
-                "content": "Welcome to QuickTab!"
+                "tabs": [
+                    { "id": "nt_1", "name": "Tab 1", "content": "Welcome to QuickTab!" }
+                ],
+                "activeTab": "nt_1"
             }
         }
         localStorage.setItem(key, JSON.stringify(value));
@@ -420,7 +423,7 @@ $(document).ready(function () {
             <li style="display:none;" data-id="${task_id}">
                 <div class="todo-task">
                     <span class="todo-check"></span>
-                    <input class="taskName" data-id="${task_id}" value="${taskName}" readonly>
+                    <input class="taskName" data-id="${task_id}" value="${taskName}" title="${taskName}" readonly>
                 </div>
                 <img src="../res/logo/close.svg" class="deleteTask" alt="delete">
             </li>
@@ -459,7 +462,7 @@ $(document).ready(function () {
                 <li data-id="${task.id}">
                     <div class="todo-task">
                         <span class="todo-check ${task.completed ? 'completed' : ''}"></span>
-                        <input class="taskName ${task.completed ? 'completed' : ''}" data-id="${task.id}" value="${task.name}" readonly>
+                        <input class="taskName ${task.completed ? 'completed' : ''}" data-id="${task.id}" value="${task.name}" title="${task.name}" readonly>
                     </div>
                     <img src="../res/logo/close.svg" class="deleteTask" alt="delete">
                 </li>
@@ -564,31 +567,192 @@ $(document).ready(function () {
         const $togglePreviewBtn = $('#togglePreviewBtn');
         const $toggleSplitBtn = $('#toggleSplitBtn');
         const $fullScreenBtn = $('#fullScreenBtn');
+        const $syncBtn = $('#syncBtn');
+        const $tabAddBtn = $('#tabAddBtn');
+        const $tabsList = $('#notepadTabsList');
         const $notepadContainer = $('.notepad-container');
         const $notepadBody = $('.notepad-body');
 
-        // Load saved content
-        if (data.notepad.content) {
-            $notepad.val(data.notepad.content);
+        // Migration: convert old single-content format to tabs
+        if (data.notepad.content !== undefined && !data.notepad.tabs) {
+            data.notepad.tabs = [
+                { id: 'nt_1', name: 'Tab 1', content: data.notepad.content || '' }
+            ];
+            data.notepad.activeTab = 'nt_1';
+            delete data.notepad.content;
+            localStorage.setItem(key, JSON.stringify(data));
         }
+
+        // Ensure tabs exists
+        if (!data.notepad.tabs || data.notepad.tabs.length === 0) {
+            data.notepad.tabs = [{ id: 'nt_1', name: 'Tab 1', content: '' }];
+            data.notepad.activeTab = 'nt_1';
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        let tabIdCounter = data.notepad.tabs.length;
 
         let isSplit = false;
         let isPreview = false;
         let isFullScreen = false;
 
-        // Autosave on input & Realtime Preview
-        $notepad.on('input', function () {
-            data.notepad.content = $notepad.val();
+        function getActiveTab() {
+            return data.notepad.tabs.find(t => t.id === data.notepad.activeTab);
+        }
+
+        function saveActiveTabContent() {
+            const active = getActiveTab();
+            if (active) {
+                active.content = $notepad.val();
+            }
+        }
+
+        function persist() {
             localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        function loadTabContent(tabId) {
+            const tab = data.notepad.tabs.find(t => t.id === tabId);
+            if (tab) {
+                $notepad.val(tab.content);
+                updatePreviewIfActive();
+            }
+        }
+
+        function renderTabs() {
+            $tabsList.empty();
+
+            data.notepad.tabs.forEach(tab => {
+                const isActive = tab.id === data.notepad.activeTab;
+                const $tab = $(document.createElement('div'));
+                $tab.addClass('notepad-tab' + (isActive ? ' active' : ''));
+                $tab.attr('data-id', tab.id);
+
+                const $name = $(document.createElement('input'));
+                $name.addClass('tab-name');
+                $name.attr('type', 'text');
+                $name.attr('readonly', true);
+                $name.attr('title', tab.name);
+                $name.val(tab.name);
+                $tab.append($name);
+
+                const $close = $(document.createElement('span'));
+                $close.addClass('tab-close');
+                $close.html('&times;');
+                $tab.append($close);
+
+                // Click to switch
+                $tab.on('click', function (e) {
+                    if ($(e.target).hasClass('tab-close')) return;
+                    if ($(e.target).is('input') && !$(e.target).attr('readonly')) return;
+                    const id = $(this).data('id');
+                    if (id !== data.notepad.activeTab) {
+                        saveActiveTabContent();
+                        data.notepad.activeTab = id;
+                        persist();
+                        renderTabs();
+                        loadTabContent(id);
+                    }
+                });
+
+                // Double-click to rename (todo-style)
+                $name.on('dblclick', function () {
+                    $(this).attr('readonly', false);
+                    $(this).focus();
+                });
+
+                $name.on('blur', function () {
+                    const id = $tab.data('id');
+                    const tab = data.notepad.tabs.find(t => t.id === id);
+                    if (tab) {
+                        const val = $(this).val().trim();
+                        if (val) tab.name = val;
+                        persist();
+                    }
+                    $(this).attr('readonly', true);
+                    renderTabs();
+                });
+
+                $name.on('keydown', function (e) {
+                    if (e.key === 'Enter') $(this).blur();
+                });
+
+                // Close button
+                $close.on('click', function (e) {
+                    e.stopPropagation();
+                    const id = $tab.data('id');
+                    deleteTab(id);
+                });
+
+                $tabsList.append($tab);
+            });
+
+            // Disable add button at max
+            $tabAddBtn.prop('disabled', data.notepad.tabs.length >= 3);
+
+            // Ensure active tab content is loaded
+            if (!getActiveTab()) {
+                data.notepad.activeTab = data.notepad.tabs[0].id;
+                persist();
+            }
+            loadTabContent(data.notepad.activeTab);
+        }
+
+        function addTab() {
+            if (data.notepad.tabs.length >= 3) return;
+            saveActiveTabContent();
+
+            tabIdCounter++;
+            const newTab = {
+                id: 'nt_' + tabIdCounter,
+                name: 'Tab ' + (data.notepad.tabs.length + 1),
+                content: ''
+            };
+            data.notepad.tabs.push(newTab);
+            data.notepad.activeTab = newTab.id;
+            persist();
+            renderTabs();
+        }
+
+        function deleteTab(tabId) {
+            if (data.notepad.tabs.length <= 1) return;
+            const confirmed = window.confirm('Delete this tab and its content?');
+            if (!confirmed) return;
+
+            const idx = data.notepad.tabs.findIndex(t => t.id === tabId);
+            data.notepad.tabs = data.notepad.tabs.filter(t => t.id !== tabId);
+
+            if (data.notepad.activeTab === tabId) {
+                const newIdx = Math.min(idx, data.notepad.tabs.length - 1);
+                data.notepad.activeTab = data.notepad.tabs[newIdx].id;
+            }
+            persist();
+            renderTabs();
+        }
+
+        // ---- Tab bar events ----
+        $tabAddBtn.on('click', addTab);
+
+        // ---- Autosave on input ----
+        $notepad.on('input', function () {
+            saveActiveTabContent();
+            persist();
 
             if (isSplit || isPreview) {
-                const markdownText = $notepad.val();
-                const htmlContent = marked.parse(markdownText);
+                const htmlContent = marked.parse($notepad.val());
                 $notepadPreview.html(htmlContent);
             }
         });
 
-        // Toggle Full Screen
+        // ---- Sync button (explicit save with feedback) ----
+        $syncBtn.on('click', function () {
+            saveActiveTabContent();
+            persist();
+            $syncBtn.addClass('sync-feedback');
+            setTimeout(function () { $syncBtn.removeClass('sync-feedback'); }, 300);
+        });
+
+        // ---- Toggle Full Screen ----
         $fullScreenBtn.on('click', function () {
             isFullScreen = !isFullScreen;
             const $widgetContainer = $('#widget-container');
@@ -597,16 +761,11 @@ $(document).ready(function () {
             $notepadBody.toggleClass('full-screen');
             $widgetContainer.toggleClass('notepad-expanded');
 
-            if (isFullScreen) {
-                window.scrollTo(0, document.body.scrollHeight);
-                $(this).attr('src', 'res/logo/compress.svg');
-            } else {
-                window.scrollTo(0, document.body.scrollHeight);
-                $(this).attr('src', 'res/logo/expand.svg');
-            }
+            $(this).attr('src', isFullScreen ? 'res/logo/compress.svg' : 'res/logo/expand.svg');
+            window.scrollTo(0, document.body.scrollHeight);
         });
 
-        // Toggle Split View (Switch Logic)
+        // ---- Toggle Split View ----
         $toggleSplitBtn.on('change', function () {
             isSplit = $(this).is(':checked');
             const $wrapper = $('.widget-wrapper');
@@ -616,15 +775,10 @@ $(document).ready(function () {
                 $notepadBody.addClass('split-active');
                 $wrapper.addClass('split-mode');
 
-                // Show both
                 $notepad.show();
                 $notepadPreview.show();
+                $notepadPreview.html(marked.parse($notepad.val()));
 
-                // Render content
-                const markdownText = $notepad.val();
-                $notepadPreview.html(marked.parse(markdownText));
-
-                // Reset Preview Mode state if it was active
                 if (isPreview) {
                     isPreview = false;
                     $togglePreviewBtn.attr('src', 'res/logo/play.svg');
@@ -633,16 +787,13 @@ $(document).ready(function () {
                 $notepadContainer.removeClass('split-active');
                 $notepadBody.removeClass('split-active');
                 $wrapper.removeClass('split-mode');
-
-                // Return to normal Edit mode
                 $notepad.show();
                 $notepadPreview.hide();
             }
         });
 
-        // Toggle Preview (Single View)
+        // ---- Toggle Preview ----
         $togglePreviewBtn.on('click', function () {
-            // If Split is active, turn it off first
             if (isSplit) {
                 isSplit = false;
                 $notepadContainer.removeClass('split-active');
@@ -652,17 +803,12 @@ $(document).ready(function () {
             }
 
             if (!isPreview) {
-                // Switch to Full Preview
-                const markdownText = $notepad.val();
-                const htmlContent = marked.parse(markdownText);
-                $notepadPreview.html(htmlContent);
-
+                $notepadPreview.html(marked.parse($notepad.val()));
                 $notepad.hide();
                 $notepadPreview.show();
                 $(this).attr('src', 'res/logo/edit.svg');
                 isPreview = true;
             } else {
-                // Switch to Edit
                 $notepadPreview.hide();
                 $notepad.show();
                 $(this).attr('src', 'res/logo/play.svg');
@@ -670,26 +816,22 @@ $(document).ready(function () {
             }
         });
 
-        // Editor/Preview Sync on Reset
+        // ---- Preview sync helper ----
         function updatePreviewIfActive() {
             if (isPreview || isSplit) {
-                const markdownText = $notepad.val();
-                const htmlContent = marked.parse(markdownText);
-                $notepadPreview.html(htmlContent);
+                $notepadPreview.html(marked.parse($notepad.val()));
             }
         }
 
-        // Export notepad content (Original Save - TXT)
+        // ---- Export TXT ----
         $exportBtn.on('click', function () {
-            const textToSave = $notepad.val();
-            const blob = new Blob([textToSave], { type: "text/plain;charset=utf-8" });
+            const blob = new Blob([$notepad.val()], { type: "text/plain;charset=utf-8" });
             saveAs(blob, "QuickTab Note.txt");
         });
 
-        // Export as Markdown (New Export - MD)
+        // ---- Export MD ----
         $exportMDBtn.on('click', function () {
-            const textToSave = $notepad.val();
-            const blob = new Blob([textToSave], { type: "text/markdown;charset=utf-8" });
+            const blob = new Blob([$notepad.val()], { type: "text/markdown;charset=utf-8" });
             saveAs(blob, "QuickTab Note.md");
         });
 
@@ -700,16 +842,21 @@ $(document).ready(function () {
             link.click();
         }
 
-        // Reset button (Clear)
+        // ---- Reset (clear active tab) ----
         $resetBtn.on('click', function () {
-            let confirmReset = window.confirm("Clear Notepad?");
-            if (confirmReset) {
+            const active = getActiveTab();
+            if (!active) return;
+            const confirmed = window.confirm("Clear this tab?");
+            if (confirmed) {
+                active.content = '';
                 $notepad.val('');
-                data.notepad.content = '';
-                localStorage.setItem(key, JSON.stringify(data));
+                persist();
                 updatePreviewIfActive();
             }
         });
+
+        // ---- Init ----
+        renderTabs();
     }
 
 
