@@ -57,32 +57,40 @@
 
                     <!-- WEATHER -->
                     <div class="weather-container">
-                        <div class="weather-heading">
-                            <div>
-                                <img src="/res/logo/weather/Cloudy.svg" id="weatherIcon" alt="weather">
-                                <h3 class="weather-value" id="temperature"></h3>
-                            </div>
+                        <div class="weather-primary">
+                            <img src="/res/logo/weather/Cloudy.svg" id="weatherIcon" alt="weather">
+                            <h3 class="weather-temp" id="temperature"></h3>
+                            <span class="weather-location" id="location"></span>
                         </div>
                         <div class="weather-body">
                             <div class="weather-option">
                                 <img src="/res/logo/weather/Humidity.svg" alt="humidity">
-                                <p class="humidity-value" id="humidity"></p>
+                                <div class="weather-option-info">
+                                    <span class="weather-option-label">Humidity</span>
+                                    <span class="weather-option-value" id="humidity"></span>
+                                </div>
                             </div>
                             <div class="weather-option">
-                                <img src="../res/logo/weather/Wind.svg" alt="wind_speed">
-                                <p class="humidity-value" id="windSpeed"></p>
+                                <img src="../res/logo/weather/Wind.svg" alt="wind">
+                                <div class="weather-option-info">
+                                    <span class="weather-option-label">Wind</span>
+                                    <span class="weather-option-value" id="windSpeed"></span>
+                                </div>
                             </div>
                             <div class="weather-option">
-                                <img src="../res/logo/weather/Temperature.svg" alt="feels_like">
-                                <p class="humidity-value" id="feelsLike"></p>
+                                <img src="../res/logo/weather/Temperature.svg" alt="feels">
+                                <div class="weather-option-info">
+                                    <span class="weather-option-label">Feels</span>
+                                    <span class="weather-option-value" id="feelsLike"></span>
+                                </div>
                             </div>
                             <div class="weather-option">
-                                <img src="../res/logo/weather/Thermometer.svg" alt="temp_min_max">
-                                <p class="humidity-value" id="highTemp"></p>
+                                <img src="../res/logo/weather/Thermometer.svg" alt="range">
+                                <div class="weather-option-info">
+                                    <span class="weather-option-label">Range</span>
+                                    <span class="weather-option-value" id="highTemp"></span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="weather-footer">
-                            <p id="location"></p>
                         </div>
                     </div>
 

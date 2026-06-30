@@ -8,5 +8,4 @@
 # Advance Upgrades
 - Voice Meter 
 - Record Audio
-- Music Player
 - 
