@@ -87,9 +87,66 @@ $(document).ready(function () {
     // APPLY WEATHER API
     function weather() {
 
+        let locationText = '';
+        let conditionText = '';
+
+        const locationEl = document.getElementById('location');
+        const CYCLE_MS = 10000;
+        const SLIDE_MS = 400;
+        let cycleIndex = 0;
+
+        function getGreeting() {
+            const h = new Date().getHours();
+            if (h >= 5 && h < 12) return 'Good Morning';
+            if (h >= 12 && h < 17) return 'Good Afternoon';
+            if (h >= 17 && h < 21) return 'Good Evening';
+            return 'Good Night';
+        }
+
+        function mapCondition(main) {
+            const m = (main || '').toLowerCase();
+            if (m.includes('thunderstorm')) return 'Stormy';
+            if (m.includes('drizzle') || m.includes('rain')) return 'Rainy';
+            if (m.includes('snow')) return 'Snowy';
+            if (m.includes('mist') || m.includes('fog') || m.includes('haze')) return 'Foggy';
+            if (m.includes('cloud')) return 'Cloudy';
+            if (m.includes('clear')) return 'Sunny';
+            return main;
+        }
+
+        function buildTexts() {
+            const texts = [getGreeting()];
+            if (conditionText) texts.push(conditionText);
+            if (locationText) texts.push(locationText);
+            return texts;
+        }
+
+        function cycleTexts() {
+            const texts = buildTexts();
+            if (texts.length < 2) return;
+
+            cycleIndex = (cycleIndex + 1) % texts.length;
+            const next = texts[cycleIndex];
+
+            // current text slides out to the LEFT
+            locationEl.classList.remove('slide-in');
+            locationEl.classList.add('slide-out');
+            setTimeout(function () {
+                // swap, then new text slides in from the RIGHT
+                locationEl.textContent = next;
+                locationEl.classList.remove('slide-out');
+                locationEl.classList.add('slide-in');
+            }, 400);
+        }
+
+        function startCycle() {
+            locationEl.textContent = getGreeting();
+            setInterval(cycleTexts, CYCLE_MS);
+        }
+
         function fetchWeatherData() {
             const apiKey = QUICKTAB_CONFIG.WEATHER_API_KEY;
-            // fetch location from localstorage 
+            // fetch location from localstorage
             const location = data.settings.weatherLocation;
             const apiUrl = 'https://api.openweathermap.org/data/2.5/weather?q=' + location + '&units=metric&appid=' + apiKey;
 
@@ -105,7 +162,10 @@ $(document).ready(function () {
                     document.getElementById('windSpeed').textContent = data.wind.speed + 'km/h';
                     document.getElementById('feelsLike').textContent = parseInt(data.main.feels_like) + '°C';
                     document.getElementById('highTemp').textContent = parseInt(data.main.temp_max) + '°C' + '/' + parseInt(data.main.temp_min) + '°C';
-                    document.getElementById('location').textContent = data.name + ', ' + data.sys.country;
+
+                    // store city + friendly weather condition for the rotating text
+                    locationText = data.name;
+                    conditionText = mapCondition(data.weather[0].main);
 
                     // Update the weather icon based on the weather condition
                     const weatherIcon = document.getElementById('weatherIcon');
@@ -117,6 +177,7 @@ $(document).ready(function () {
                 });
         }
 
+        startCycle();
         fetchWeatherData();
     } weather();
 

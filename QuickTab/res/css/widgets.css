@@ -866,6 +866,33 @@ input[type=number] {
   text-overflow: ellipsis;
   max-width: 120px;
   text-align: right;
+  display: inline-block;
+}
+.weather-primary .weather-location.slide-out {
+  animation: locationSlideOut 0.4s ease forwards;
+}
+.weather-primary .weather-location.slide-in {
+  animation: locationSlideIn 0.4s ease forwards;
+}
+@keyframes locationSlideOut {
+  from {
+    opacity: 0.65;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+}
+@keyframes locationSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 0.65;
+    transform: translateX(0);
+  }
 }
 
 .weather-body {
