@@ -974,4 +974,264 @@ body::-webkit-scrollbar {
 }
 .settings-body .schedule-modal-actions button.primary:hover {
   opacity: 0.85;
+}
+
+/* ================= TINYAPPS (settings page) ================= */
+.settings-main #tinyapps {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.settings-main #tinyapps h3 {
+  font-family: fontSB;
+  font-size: 26px;
+  color: #000;
+  margin-bottom: 4px;
+}
+.settings-main #tinyapps .tinyapps-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.settings-main #tinyapps .tinyapp-toolbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.settings-main #tinyapps .tinyapp-toolbar h4 {
+  font-family: fontSB;
+  font-size: 20px;
+  color: #000;
+  font-weight: 400;
+}
+.settings-main #tinyapps .tinyapp-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  -webkit-user-select: none;
+          user-select: none;
+}
+.settings-main #tinyapps .tinyapp-toggle-text {
+  font-family: fontM;
+  font-size: 14px;
+  color: #000;
+}
+.settings-main #tinyapps .tinyapp-toggle input {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  width: 44px;
+  height: 24px;
+  margin: 0;
+  border-radius: 12px;
+  background: #d5d5d9;
+  position: relative;
+  flex-shrink: 0;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.2s;
+}
+.settings-main #tinyapps .tinyapp-toggle input::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s;
+}
+.settings-main #tinyapps .tinyapp-toggle input:checked {
+  background: #000;
+}
+.settings-main #tinyapps .tinyapp-toggle input:checked::after {
+  transform: translateX(20px);
+}
+.settings-main #tinyapps .tinyapps-slots.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.settings-main #tinyapps .tinyapps-hint {
+  font-family: fontM;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+.settings-main #tinyapps .tinyapps-hint code {
+  font-family: Consolas, Menlo, monospace;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.settings-main #tinyapps .tinyapps-slots {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.settings-main #tinyapps .tinyapp-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 14px;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 6px 18px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
+}
+.settings-main #tinyapps .tinyapp-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.settings-main #tinyapps .tinyapp-card-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #000;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: fontSB;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.settings-main #tinyapps .tinyapp-card-name {
+  font-family: fontSB;
+  font-size: 17px;
+  color: #000;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.settings-main #tinyapps .tinyapp-preview-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  background: #f5f5f8;
+  border-radius: 12px;
+}
+.settings-main #tinyapps .tinyapp-tile-preview {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+.settings-main #tinyapps .tinyapp-tile-preview.wide {
+  width: 150px;
+  height: 64px;
+  flex-direction: row;
+  gap: 12px;
+  padding: 0 12px;
+  justify-content: flex-start;
+}
+.settings-main #tinyapps .tinyapp-preview-img {
+  width: 30px;
+  height: 30px;
+  -o-object-fit: contain;
+     object-fit: contain;
+  flex-shrink: 0;
+}
+.settings-main #tinyapps .tinyapp-tile-preview.wide .tinyapp-preview-img {
+  width: 36px;
+  height: 36px;
+}
+.settings-main #tinyapps .tinyapp-preview-label {
+  display: none;
+  font-family: fontSB;
+  font-size: 15px;
+  color: #000;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.settings-main #tinyapps .tinyapp-tile-preview.wide .tinyapp-preview-label {
+  display: block;
+}
+.settings-main #tinyapps .tinyapp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.settings-main #tinyapps .tinyapp-field span {
+  font-family: fontM;
+  font-size: 13px;
+  color: #000;
+}
+.settings-main #tinyapps .tinyapp-field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  border-radius: 9px;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  outline: none;
+  background-color: #fff;
+  color: #000;
+  font-family: fontM;
+  font-size: 14px;
+  transition: 0.15s;
+}
+.settings-main #tinyapps .tinyapp-field input:hover {
+  border-color: rgba(0, 0, 0, 0.3);
+}
+.settings-main #tinyapps .tinyapp-field input:focus {
+  border-color: #000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+}
+.settings-main #tinyapps .tinyapp-wide {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 2px;
+  cursor: pointer;
+}
+.settings-main #tinyapps .tinyapp-wide input {
+  width: 17px;
+  height: 17px;
+  accent-color: #000;
+  cursor: pointer;
+}
+.settings-main #tinyapps .tinyapp-wide-text {
+  font-family: fontM;
+  font-size: 14px;
+  color: #000;
+}
+.settings-main #tinyapps .tinyapps-save-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+.settings-main #tinyapps .save-tinyapps-btn {
+  padding: 11px 32px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background-color: #000;
+  color: #fff;
+  font-family: fontM;
+  font-size: 15px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  transition: 0.2s;
+}
+.settings-main #tinyapps .save-tinyapps-btn:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
 }/*# sourceMappingURL=main.css.map */

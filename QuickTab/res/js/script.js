@@ -494,6 +494,124 @@ $(document).ready(function () {
         window.location.href = "/res/theme/settings.html#bookmarks";
     });
 
+    ////////// TINYAPPS //////////
+    function tinyapps() {
+        const TKEY = "quicktab_tinyapps";
+        const container = document.getElementById("tinyappsContainer");
+        if (!container) return;
+
+        function load() {
+            try {
+                const parsed = JSON.parse(localStorage.getItem(TKEY));
+                if (!Array.isArray(parsed)) return [];
+                return parsed
+                    .filter(function (a) { return a && typeof a === "object"; })
+                    .map(function (a) {
+                        return {
+                            name: typeof a.name === "string" ? a.name : "",
+                            title: typeof a.title === "string" ? a.title : "",
+                            url: typeof a.url === "string" ? a.url : "",
+                            logo: typeof a.logo === "string" ? a.logo : "",
+                            wide: !!a.wide
+                        };
+                    })
+                    .slice(0, 4);
+            } catch (e) { return []; }
+        }
+
+        function isConfigured(a) {
+            return !!(a && (a.name || a.url || a.logo));
+        }
+
+        function render() {
+            const enabled = !(localStorage.getItem("quicktab_tinyapps_enabled") === "0" ||
+                localStorage.getItem("quicktab_tinyapps_enabled") === "false");
+
+            const raw = load();
+            const slots = [];
+            for (let i = 0; i < 4; i++) {
+                slots.push(raw[i] || { name: "", title: "", url: "", logo: "", wide: false });
+            }
+            const configured = slots.filter(isConfigured);
+
+            container.innerHTML = "";
+
+            if (!configured.length || !enabled) {
+                container.style.display = "none";
+                return;
+            }
+            container.style.display = "flex";
+
+            // 4 slots: square = 1 unit, wide = 2 units, blank = 1 unit.
+            // Squares never exceed 64px; blank blocks absorb leftover space.
+            // Each slot renders in its own position (1..4).
+            const GAP = 10;
+            const MAX = 64;
+            const blanksCount = 4 - configured.length;
+            const units = configured.reduce(function (s, a) { return s + (a.wide ? 2 : 1); }, 0) + blanksCount;
+            const rowW = container.clientWidth || 300;
+            const base = Math.min(MAX, Math.max(24, (rowW - 3 * GAP) / units));
+            const height = base;
+
+            for (let i = 0; i < 4; i++) {
+                const a = slots[i];
+                if (!isConfigured(a)) {
+                    const block = document.createElement("div");
+                    block.className = "tinyapp-tile placeholder";
+                    block.style.flex = "1 1 0px";
+                    block.style.minWidth = base + "px";
+                    block.style.height = height + "px";
+                    container.appendChild(block);
+                    continue;
+                }
+
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "tinyapp-tile" + (a.wide ? " wide" : "");
+                btn.title = a.name + (a.url ? " (" + a.url + ")" : "");
+                btn.style.width = (a.wide ? 2 * base + GAP : base) + "px";
+                btn.style.height = height + "px";
+
+                const img = document.createElement("img");
+                img.className = "tinyapp-logo";
+                img.alt = a.name;
+                img.src = "/tinyapps_logo/" + (a.logo || "default.svg");
+                img.onerror = function () {
+                    if (img.getAttribute("data-fallback") !== "1") {
+                        img.setAttribute("data-fallback", "1");
+                        img.src = "/tinyapps_logo/default.svg";
+                    }
+                };
+
+                btn.appendChild(img);
+
+                if (a.wide) {
+                    const label = document.createElement("span");
+                    label.className = "tinyapp-label";
+                    label.textContent = a.title || a.name;
+                    btn.appendChild(label);
+                }
+
+                if (a.url) {
+                    btn.addEventListener("click", function () {
+                        window.open(a.url, "_blank");
+                    });
+                }
+
+                container.appendChild(btn);
+            }
+        }
+
+        render();
+
+        window.addEventListener("storage", function (e) {
+            if (e.key === "quicktab_tinyapps" || e.key === "quicktab_tinyapps_enabled") {
+                render();
+            }
+        });
+    }
+    tinyapps();
+
     ////////// TO DO LIST //////////
     function todo() {
         function getTasks() {

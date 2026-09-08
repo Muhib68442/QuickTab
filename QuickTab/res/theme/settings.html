@@ -20,6 +20,7 @@
             <li><a href="#personalize">Personalize</a></li>
             <li><a href="#bookmarks">Bookmarks</a></li>
             <li><a href="#schedules">Schedules</a></li>
+            <li><a href="#tinyapps">TinyApps</a></li>
             <!-- <li><a href="#widgets">Widgets</a></li> -->
             <li><a href="#about">About</a></li>
         </ul>
@@ -295,6 +296,29 @@
                     <ul id="scheduleList">
 
                     </ul>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- TINYAPPS -->
+        <section id="tinyapps">
+            <h3>TinyApps</h3>
+            <div class="tinyapps-manager">
+<div class="tinyapp-toolbar">
+                        <div class="tinyapp-toolbar-row">
+                            <h4>4 App Slots</h4>
+                            <label class="tinyapp-toggle" title="Show TinyApps on the new tab page">
+                                <span class="tinyapp-toggle-text">Enable TinyApps</span>
+                                <input type="checkbox" id="tinyappsEnabled">
+                            </label>
+                        </div>
+                        <p class="tinyapps-hint">Apps are capped at 64&times;64 px. Logos live in <code>/tinyapps_logo/</code> — leave Logo file empty to use <code>default.svg</code>. Wide slots fill the space of 2 squares and show the Title. Empty slots appear as blank blocks on the page.</p>
+                    </div>
+                <div class="tinyapps-slots" id="tinyappsSlots"></div>
+                <div class="tinyapps-save-row">
+                    <button id="saveTinyappsBtn" class="save-tinyapps-btn">Save TinyApps</button>
                 </div>
             </div>
         </section>

@@ -348,6 +348,163 @@ $(document).ready(function() {
     }
     schedules();
 
+    // TINYAPPS -----------------------------------------------------------
+    function tinyapps() {
+        const TKEY = "quicktab_tinyapps";
+        const EKEY = "quicktab_tinyapps_enabled";
+        const SLOTS = 4;
+        const DEFAULT_LOGO = "/tinyapps_logo/default.svg";
+        let arr;
+
+        function loadEnabled() {
+            const v = localStorage.getItem(EKEY);
+            return v === null || v === "1" || v === "true";
+        }
+
+        function load() {
+            try {
+                const parsed = JSON.parse(localStorage.getItem(TKEY));
+                if (Array.isArray(parsed)) return parsed;
+            } catch (e) { }
+            return [];
+        }
+        function save(list) { localStorage.setItem(TKEY, JSON.stringify(list)); }
+        function normalize() {
+            const a = load();
+            while (a.length < SLOTS) {
+                a.push({ name: "", title: "", url: "", logo: "", wide: false });
+            }
+            a.length = SLOTS;
+            return a;
+        }
+
+        function setLogo($img, logo) {
+            $img.attr("src", logo ? "/tinyapps_logo/" + logo : DEFAULT_LOGO);
+            $img.off("error").on("error", function () {
+                $(this).attr("src", DEFAULT_LOGO);
+            });
+        }
+
+        function cardHTML(i) {
+            return `
+                <div class="tinyapp-card" data-slot="${i}">
+                    <div class="tinyapp-card-head">
+                        <span class="tinyapp-card-num">${i + 1}</span>
+                        <span class="tinyapp-card-name">App ${i + 1}</span>
+                    </div>
+                    <div class="tinyapp-preview-wrap">
+                        <div class="tinyapp-tile-preview">
+                            <img class="tinyapp-preview-img" src="${DEFAULT_LOGO}" alt="">
+                            <span class="tinyapp-preview-label">App name</span>
+                        </div>
+                    </div>
+                    <label class="tinyapp-field">
+                        <span>Name</span>
+                        <input type="text" class="tiny-name" placeholder="e.g. Gmail" autocomplete="off">
+                    </label>
+                    <label class="tinyapp-field">
+                        <span>Title (wide slot)</span>
+                        <input type="text" class="tiny-title" placeholder="e.g. Gmail Mail" autocomplete="off">
+                    </label>
+                    <label class="tinyapp-field">
+                        <span>URL</span>
+                        <input type="text" class="tiny-url" placeholder="https://... or file:///..." autocomplete="off">
+                    </label>
+                    <label class="tinyapp-field">
+                        <span>Logo file</span>
+                        <input type="text" class="tiny-logo" placeholder="myapp.svg" autocomplete="off">
+                    </label>
+                    <label class="tinyapp-wide">
+                        <input type="checkbox" class="tiny-wide">
+                        <span class="tinyapp-wide-text">Wide slot</span>
+                    </label>
+                </div>`;
+        }
+
+        function render() {
+            arr = normalize();
+            const enabled = loadEnabled();
+            $("#tinyappsEnabled").prop("checked", enabled);
+            $("#tinyappsSlots").toggleClass("disabled", !enabled);
+
+            const $wrap = $("#tinyappsSlots");
+            $wrap.empty();
+
+            for (let i = 0; i < SLOTS; i++) {
+                const $card = $(cardHTML(i));
+                const a = arr[i];
+                const $preview = $card.find(".tinyapp-tile-preview");
+                const $img = $card.find(".tinyapp-preview-img");
+                const $label = $card.find(".tinyapp-preview-label");
+                const $headName = $card.find(".tinyapp-card-name");
+
+                $card.find(".tiny-name").val(a.name);
+                $card.find(".tiny-title").val(a.title);
+                $card.find(".tiny-url").val(a.url);
+                $card.find(".tiny-logo").val(a.logo);
+                $card.find(".tiny-wide").prop("checked", a.wide);
+
+                setLogo($img, a.logo);
+                if (a.wide) {
+                    $preview.addClass("wide");
+                    $label.text(a.title || a.name || "App name");
+                }
+                if (a.name) $headName.text("App " + (i + 1) + " — " + a.name);
+
+                function updatePreview() {
+                    $label.text(arr[i].title || arr[i].name || "App name");
+                }
+
+                $card.find(".tiny-name").on("input", function () {
+                    arr[i].name = $(this).val();
+                    $headName.text("App " + (i + 1) + (arr[i].name ? " — " + arr[i].name : ""));
+                    updatePreview();
+                });
+                $card.find(".tiny-title").on("input", function () {
+                    arr[i].title = $(this).val();
+                    updatePreview();
+                });
+                $card.find(".tiny-url").on("input", function () {
+                    arr[i].url = $(this).val();
+                });
+                $card.find(".tiny-logo").on("input", function () {
+                    arr[i].logo = $(this).val();
+                    setLogo($img, arr[i].logo);
+                });
+                $card.find(".tiny-wide").on("change", function () {
+                    if ($(this).is(":checked") && arr.filter(function (x) { return x.wide; }).length >= 3) {
+                        $(this).prop("checked", false);
+                        alert("At least one slot must stay a square — you can't make all slots wide.");
+                        return;
+                    }
+                    arr[i].wide = $(this).is(":checked");
+                    $preview.toggleClass("wide", arr[i].wide);
+                    updatePreview();
+                });
+
+                $wrap.append($card);
+            }
+        }
+
+        $("#tinyappsEnabled").on("change", function () {
+            const on = $(this).is(":checked");
+            localStorage.setItem(EKEY, on ? "1" : "0");
+            $("#tinyappsSlots").toggleClass("disabled", !on);
+        });
+
+        $("#saveTinyappsBtn").on("click", function () {
+            if (arr.every(function (x) { return x.wide; })) {
+                alert("At least one slot must stay a square — you can't make all slots wide.");
+                return;
+            }
+            save(arr);
+            alert("TinyApps saved!");
+        });
+
+        render();
+    }
+    tinyapps();
+
     // WALLPAPER -----------------------------------------------------------
     function wallpaper(){
        let isDynamic = data.settings.wallpaper == "dynamic" ? true : false;

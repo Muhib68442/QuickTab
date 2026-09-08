@@ -821,6 +821,108 @@ input:checked + .switch-slider:before {
     border-color: var(--theme) !important;
 }
 
+/********** TINYAPPS **********/
+.vertical-wrapper > .tinyapps-container {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+    user-select: none;
+}
+
+/* media keeps its compact height;
+   bookmark absorbs the extra space left by the tinyapps row */
+.vertical-wrapper > .media-controller-container {
+    flex: 0 0 auto;
+}
+
+.tinyapp-tile {
+    flex: 0 0 auto;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 6px 4px;
+    background-color: var(--bg-secondary);
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.tinyapp-tile.wide {
+    flex-direction: row;
+    gap: 10px;
+    width: 130px;
+    padding: 10px;
+}
+
+.tinyapp-tile:hover {
+    background-color: var(--theme);
+    border-color: var(--theme);
+    transform: translateY(-2px);
+}
+
+.tinyapp-logo {
+    width: 94%;
+    height: 94%;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.tinyapp-tile.wide .tinyapp-logo {
+    width: 38px;
+    height: 38px;
+}
+
+.tinyapp-label {
+    font-family: fontM;
+    font-size: 10px;
+    line-height: 1.1;
+    color: var(--text-b);
+    opacity: 0.85;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.tinyapp-tile.wide .tinyapp-label {
+    font-family: fontSB;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tinyapp-tile:hover .tinyapp-label {
+    color: #fff;
+}
+
+.tinyapp-tile.placeholder {
+    border-style: dashed;
+    opacity: 0.45;
+    cursor: default;
+    box-shadow: none;
+    pointer-events: none;
+}
+
+.tinyapp-tile.placeholder:hover {
+    background-color: var(--bg-secondary);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: none;
+}
+
 /* Hide number input arrow */
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
