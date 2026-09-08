@@ -12,6 +12,7 @@
     "activeTab"
   ],
   "host_permissions": [
+    "<all_urls>",
     "*://www.youtube.com/*",
     "*://*.youtube.com/*",
     "*://music.youtube.com/*"

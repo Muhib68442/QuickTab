@@ -1598,6 +1598,12 @@ $list.append($li);
 
         let isPlaying = true;
 
+        function setPlayingUi(nowPlaying) {
+            playPauseIcon.src = nowPlaying ? "res/logo/media/pause.svg" : "res/logo/media/play.svg";
+            playPauseBtn.title = nowPlaying ? "Pause" : "Play";
+            isPlaying = nowPlaying;
+        }
+
         // SEND COMMANDS TO BACKGROUND
         function sendAction(action, value = null) {
             if (chrome.runtime?.id) {
@@ -1627,40 +1633,56 @@ $list.append($li);
         });
 
 
-        // RECEIVE updates from YouTube tab
+        // RECEIVE updates from YouTube / local media tabs
+        let activeOwner = null;
+        let activeTabId = null;
+        let lastYtAt = 0;
+        let lastLocalAt = 0;
+        const LOCK_MS = 3000;
+
         chrome.runtime.onMessage.addListener((msg) => {
 
-            if (msg.type === "MEDIA_UPDATE") {
+            if (msg.type !== "MEDIA_UPDATE") return;
 
-                let current = msg.currentTime || 0;
-                let duration = msg.duration || 0;
-                let paused = msg.paused;
-                let title = msg.title || "YouTube Player";
+            const owner = msg.mediaOwner || "local";
+            const tabId = msg.mediaTabId;
+            const now = Date.now();
 
-                // TITLE
-                document.getElementById("mediaTitle").innerText = title;
-
-                // TIME
-                timeCurrent.innerText = formatTime(current);
-                timeDuration.innerText = formatTime(duration);
-
-                // PROGRESS BAR
-                let percent = duration ? (current / duration) * 100 : 0;
-
-                progressBar.style.width = percent + "%";
-                progressScrubber.style.left = percent + "%";
-
-                // PLAY/PAUSE ICON SYNC
-                if (paused) {
-                    playPauseIcon.src = "res/logo/media/play.svg";
-                    playPauseBtn.title = "Play";
-                    isPlaying = false;
-                } else {
-                    playPauseIcon.src = "res/logo/media/pause.svg";
-                    playPauseBtn.title = "Pause";
-                    isPlaying = true;
-                }
+            // Priority lock: YouTube owns the player. A local update is only
+            // shown when YouTube has gone quiet (no fresh update) for a while.
+            if (owner === "youtube") {
+                activeOwner = "youtube";
+                activeTabId = tabId;
+                lastYtAt = now;
+            } else {
+                if (activeOwner === "youtube" && now - lastYtAt < LOCK_MS) return;
+                // Also lock onto a single local tab to avoid multi-local flicker.
+                if (activeOwner === "local" && tabId && activeTabId && tabId !== activeTabId && now - lastLocalAt < LOCK_MS) return;
+                activeOwner = "local";
+                activeTabId = tabId;
+                lastLocalAt = now;
             }
+
+            let current = msg.currentTime || 0;
+            let duration = msg.duration || 0;
+            let paused = msg.paused;
+            let title = msg.title || "Music Player";
+
+            // TITLE
+            document.getElementById("mediaTitle").innerText = title;
+
+            // TIME
+            timeCurrent.innerText = formatTime(current);
+            timeDuration.innerText = formatTime(duration);
+
+            // PROGRESS BAR
+            let percent = duration ? (current / duration) * 100 : 0;
+
+            progressBar.style.width = percent + "%";
+            progressScrubber.style.left = percent + "%";
+
+            // PLAY/PAUSE ICON SYNC
+            setPlayingUi(!paused);
 
         });
 
