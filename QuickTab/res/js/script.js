@@ -955,6 +955,13 @@ $(document).ready(function () {
         let currentYear = today.getFullYear();
         let currentMonthIndex = today.getMonth();
 
+        window.__calendarState = { year: currentYear, month: currentMonthIndex };
+
+        // Expose redraw so the scheduler can refresh indicators after changes.
+        window.__calendarRedraw = function () {
+            renderCalendar(currentYear, currentMonthIndex);
+        };
+
         renderCalendar(currentYear, currentMonthIndex);
 
         $prevMonth.on('click', function () {
@@ -963,6 +970,7 @@ $(document).ready(function () {
                 currentMonthIndex = 11;
                 currentYear--;
             }
+            window.__calendarState = { year: currentYear, month: currentMonthIndex };
             renderCalendar(currentYear, currentMonthIndex);
         });
 
@@ -972,6 +980,7 @@ $(document).ready(function () {
                 currentMonthIndex = 0;
                 currentYear++;
             }
+            window.__calendarState = { year: currentYear, month: currentMonthIndex };
             renderCalendar(currentYear, currentMonthIndex);
         });
 
@@ -987,13 +996,29 @@ $(document).ready(function () {
             }
 
             for (let i = 1; i <= daysInMonth; i++) {
-                const $day = $('<div>').addClass('day').text(i);
+                const $day = $('<div>').addClass('day');
+                const dateKey = pad(year) + '-' + pad(month + 1) + '-' + pad(i);
+                $day.attr('data-date', dateKey);
+                $('<span>').addClass('day-num').text(i).appendTo($day);
                 if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
                     $day.addClass('current-date');
                 }
+
+                // Schedule marker — colored border on the date
+                const daySchedules = window.QuickTabScheduler ? window.QuickTabScheduler.getByDate(dateKey) : [];
+                if (daySchedules.length) {
+                    $day.addClass('has-schedule');
+                    const uniqueColors = {};
+                    daySchedules.forEach(function (ds) { uniqueColors[ds.color || '#e63e32'] = true; });
+                    const colorKeys = Object.keys(uniqueColors);
+                    $day.css('border-color', colorKeys.length > 1 ? 'var(--text-b)' : colorKeys[0]);
+                }
+
                 $daysContainer.append($day);
             }
         }
+
+        function pad(n) { return (n < 10 ? '0' : '') + n; }
 
         function getMonthName(index) {
             const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -1001,6 +1026,524 @@ $(document).ready(function () {
         }
         // console.log("Calendar Ran")
     };
+
+    ////////// SCHEDULER //////////
+    function scheduler() {
+        const STORAGE_KEY = 'quicktab_schedules';
+        const REMIND_WINDOW_MS = 10 * 60 * 1000; // remind 10 minutes before
+        const CHECK_INTERVAL_MS = 30 * 1000;
+
+        const COLOR_PRESETS = ['#e63e32', '#1176ff', '#22c55e', '#f59e0b', '#8b5cf6', '#ec4899'];
+
+        // ---- Data layer ----
+        function loadAll() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return [];
+                const parsed = JSON.parse(raw);
+                if (!Array.isArray(parsed)) return [];
+                // Normalize + dedup
+                const seen = new Set();
+                const result = [];
+                parsed.forEach(function (s) {
+                    if (!s || typeof s !== 'object') return;
+                    const id = s.id;
+                    if (!id || seen.has(id)) return;
+                    seen.add(id);
+                    result.push({
+                        id: id,
+                        status: ['not_started', 'ongoing', 'complete'].indexOf(s.status) !== -1 ? s.status : 'not_started',
+                        color: typeof s.color === 'string' && s.color ? s.color : COLOR_PRESETS[0],
+                        date: typeof s.date === 'string' ? s.date : '',
+                        time: typeof s.time === 'string' ? s.time : '',
+                        title: typeof s.title === 'string' ? s.title : ''
+                    });
+                });
+                return result;
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveAll(schedules) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(schedules));
+        }
+
+        function create(data) {
+            const list = loadAll();
+            const id = 'sch_' + Date.now().toString(36) + '_' + Math.floor(Math.random() * 100000).toString(36);
+            const item = {
+                id: id,
+                status: 'not_started',
+                color: data.color || COLOR_PRESETS[0],
+                date: data.date,
+                time: data.time,
+                title: data.title.trim()
+            };
+            list.push(item);
+            saveAll(list);
+            return item;
+        }
+
+        function update(id, data) {
+            const list = loadAll();
+            const idx = list.findIndex(function (s) { return s.id === id; });
+            if (idx === -1) return null;
+            list[idx] = Object.assign({}, list[idx], data);
+            saveAll(list);
+            return list[idx];
+        }
+
+        function remove(id) {
+            saveAll(loadAll().filter(function (s) { return s.id !== id; }));
+        }
+
+        function clearAll() {
+            saveAll([]);
+        }
+
+        function getByDate(dateKey) {
+            return loadAll().filter(function (s) { return s.date === dateKey; });
+        }
+
+        function getById(id) {
+            return loadAll().find(function (s) { return s.id === id; }) || null;
+        }
+
+        // ---- Formatting helpers ----
+        function toDateTime(s) {
+            return new Date(s.date + 'T' + (s.time || '00:00'));
+        }
+
+        function formatDate(dateKey) {
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return dateKey;
+            const parts = dateKey.split('-');
+            return parts[2] + '/' + parts[1] + '/' + parts[0];
+        }
+
+        function formatTime(time) {
+            if (!time) return '';
+            const parts = time.split(':');
+            let h = parseInt(parts[0], 10);
+            const m = parts[1] || '00';
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12;
+            h = h ? h : 12;
+            return h + ':' + m + ' ' + ampm;
+        }
+
+        // ---- UI: view switching ----
+        const $views = $('#calendarView').parent();
+        const VIEW_KEY = 'quicktab_default_view';
+        function switchView(view) {
+            localStorage.setItem(VIEW_KEY, view);
+            if (view === 'schedules') {
+                $views.addClass('show-schedules');
+                $('#calTabCalendar').removeClass('active');
+                $('#calTabSchedules').addClass('active');
+            } else {
+                $views.removeClass('show-schedules');
+                $('#calTabSchedules').removeClass('active');
+                $('#calTabCalendar').addClass('active');
+            }
+            renderSchedules();
+        }
+
+        // ---- UI: schedules list ----
+        const $list = $('#schedulesList');
+        const $empty = $('#schedulesEmpty');
+
+        const STATUS_SYMBOL = { 'not_started': '\u2610', 'ongoing': '\u25d0', 'complete': '\u2713' };
+
+        function renderSchedules() {
+            const all = loadAll().sort(function (a, b) {
+                const da = toDateTime(a).getTime();
+                const db = toDateTime(b).getTime();
+                return da - db;
+            });
+
+            $list.empty();
+
+            if (!all.length) {
+                $list.hide();
+                $empty.show();
+                return;
+            }
+            $list.show();
+            $empty.hide();
+
+            const now = Date.now();
+
+            all.forEach(function (s) {
+                const $li = $('<li>').addClass('schedule-item');
+                if (s.status === 'complete') $li.addClass('complete');
+                if (s.status !== 'complete' && toDateTime(s).getTime() < now) $li.addClass('overdue');
+
+                const $status = $('<span>').addClass('sched-status')
+                    .attr('title', 'Toggle status (click to cycle: Not started -> Ongoing -> Complete)')
+                    .text(STATUS_SYMBOL[s.status] || STATUS_SYMBOL.not_started);
+
+                const $dot = $('<span>').addClass('sched-dot').css('background-color', s.color || COLOR_PRESETS[0]);
+
+                const $info = $('<div>').addClass('schedule-info');
+                $('<p>').addClass('schedule-title').attr('title', s.title).text(s.title).appendTo($info);
+                $('<p>').addClass('schedule-meta')
+                    .text(formatDate(s.date) + ' - ' + formatTime(s.time))
+                    .appendTo($info);
+
+                const $actions = $('<div>').addClass('sched-actions');
+                const $editBtn = $('<button>').addClass('sched-action-btn').attr('title', 'Edit')
+                    .append($('<img>').attr('src', '../res/logo/edit.svg').attr('alt', 'edit'));
+                const $delBtn = $('<button>').addClass('sched-action-btn').attr('title', 'Delete')
+                    .append($('<img>').attr('src', '../res/logo/close.svg').attr('alt', 'delete'));
+                $actions.append($editBtn, $delBtn);
+
+                $li.append($status, $dot, $info, $actions);
+
+                // Status cycle click
+                $status.on('click', function () {
+                    cycleStatus(s.id);
+                });
+                // Edit
+                $editBtn.on('click', function () {
+                    openModal(s.id);
+                });
+                $delBtn.on('click', function () {
+                    deleteWithConfirm(s.id);
+                });
+                // Double-click to edit
+                $info.on('dblclick', function () {
+                    openModal(s.id);
+                });
+
+$list.append($li);
+            });
+        }
+
+        function cycleStatus(id) {
+            const s = getById(id);
+            if (!s) return;
+            const order = ['not_started', 'ongoing', 'complete'];
+            const next = order[(order.indexOf(s.status) + 1) % order.length];
+            update(id, { status: next });
+            syncUI();
+        }
+
+        // ---- Modal ----
+        const $overlay = $('#schedulerModalOverlay');
+        const $modalTitle = $('#scheduleModalTitle');
+        const $tTitle = $('#schedTitle');
+        const $tDate = $('#schedDate');
+        const $tTime = $('#schedTime');
+        const $colorRow = $('#schedColorRow');
+        const $saveBtn = $('#scheduleSaveBtn');
+        const $cancelBtn = $('#scheduleCancelBtn');
+
+        let editingId = null;
+        let selectedColor = COLOR_PRESETS[0];
+
+        function renderColorOptions() {
+            $colorRow.empty();
+            COLOR_PRESETS.forEach(function (c) {
+                const $opt = $('<div>').addClass('sched-color-option').css('background-color', c);
+                if (c === selectedColor) $opt.addClass('selected');
+                $opt.on('click', function () {
+                    selectedColor = c;
+                    $colorRow.children().removeClass('selected');
+                    $opt.addClass('selected');
+                });
+                $colorRow.append($opt);
+            });
+        }
+
+        function openModal(id) {
+            editingId = id || null;
+            $tTitle.val('');
+            $tDate.val('');
+            $tTime.val('');
+            selectedColor = COLOR_PRESETS[0];
+
+            if (id) {
+                const s = getById(id);
+                if (!s) return;
+                $modalTitle.text('Edit Schedule');
+                $tTitle.val(s.title);
+                $tDate.val(s.date);
+                $tTime.val(s.time);
+                selectedColor = s.color || COLOR_PRESETS[0];
+                $saveBtn.text('Save Changes');
+            } else {
+                $modalTitle.text('Add Schedule');
+                $saveBtn.text('Add Schedule');
+                // Default date to today
+                const now = new Date();
+                const todayKey = now.getFullYear() + '-' + pad2(now.getMonth() + 1) + '-' + pad2(now.getDate());
+                $tDate.val(todayKey);
+            }
+
+            renderColorOptions();
+            $overlay.css('display', 'flex');
+            requestAnimationFrame(function () { $overlay.addClass('show'); });
+            $tTitle.focus();
+        }
+
+        function closeModal() {
+            $overlay.removeClass('show');
+            setTimeout(function () { $overlay.css('display', 'none'); }, 250);
+            editingId = null;
+        }
+
+        function validateAndSave() {
+            const title = $tTitle.val().trim();
+            const date = $tDate.val();
+            const time = $tTime.val();
+
+            if (!title) {
+                alert('Please enter a schedule title.');
+                $tTitle.focus();
+                return;
+            }
+            if (!date) {
+                alert('Please select a date.');
+                $tDate.focus();
+                return;
+            }
+            if (!time) {
+                alert('Please select a time.');
+                $tTime.focus();
+                return;
+            }
+
+            if (editingId) {
+                const existing = getById(editingId);
+                if (!existing) return;
+                const wasNotified = existing.status === 'not_started';
+                if (wasNotified) clearReminderById(editingId);
+                update(editingId, { title: title, date: date, time: time, color: selectedColor });
+            } else {
+                create({ title: title, date: date, time: time, color: selectedColor });
+            }
+
+            closeModal();
+            syncUI();
+            checkReminders(true);
+        }
+
+        function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+        // ---- Delete / clear ----
+        function deleteWithConfirm(id) {
+            const s = getById(id);
+            if (!s) return;
+            const confirmed = window.confirm('Delete "' + s.title + '" ?');
+            if (!confirmed) return;
+            remove(id);
+            clearReminderById(id);
+            syncUI();
+        }
+
+        function clearAllSchedules() {
+            const count = loadAll().length;
+            if (!count) return;
+            const confirmed = window.confirm('Clear all ' + count + ' schedule(s) ?');
+            if (!confirmed) return;
+            clearAll();
+            remindersQueue = [];
+            currentReminderId = null;
+            hideReminder();
+            syncUI();
+        }
+
+        // ---- Reminder system ----
+        let remindersQueue = [];
+        let currentReminderId = null;
+        const $reminderPopup = $('#reminderPopup');
+
+        function clearReminderById(id) {
+            remindersQueue = remindersQueue.filter(function (s) { return s.id !== id; });
+            if (currentReminderId === id) {
+                currentReminderId = null;
+                hideReminder();
+            }
+            // Advance to next if any
+            if (remindersQueue.length) showNextReminder();
+        }
+
+        // Collect due reminders. Only "not_started" schedules qualify.
+        function collectDue() {
+            const now = Date.now();
+            const all = loadAll().filter(function (s) { return s.status === 'not_started'; });
+            const due = [];
+            all.forEach(function (s) {
+                const t = toDateTime(s).getTime();
+                // Approaching (within window before) OR just passed within window (tab was inactive)
+                const approaching = (t - now) >= 0 && (t - now) <= REMIND_WINDOW_MS;
+                const justPassed = (now - t) >= 0 && (now - t) <= REMIND_WINDOW_MS;
+                if (approaching || justPassed) due.push(s);
+            });
+            due.sort(function (a, b) { return toDateTime(a).getTime() - toDateTime(b).getTime(); });
+            return due;
+        }
+
+        function checkReminders(force) {
+            if (currentReminderId) return; // one at a time
+
+            if (force || !remindersQueue.length) {
+                remindersQueue = collectDue();
+            }
+            if (remindersQueue.length) showNextReminder();
+        }
+
+        function showNextReminder() {
+            if (currentReminderId) return;
+            const s = remindersQueue.shift();
+            if (!s) return;
+            // Skip if it became non-not_started meanwhile
+            const fresh = getById(s.id);
+            if (!fresh || fresh.status !== 'not_started') {
+                checkReminders();
+                return;
+            }
+            currentReminderId = s.id;
+            $('#reminderDot').css('background-color', fresh.color || COLOR_PRESETS[0]);
+            $('#reminderName').text(fresh.title);
+            $('#reminderMeta').text(formatDate(fresh.date) + ' \u00b7 ' + formatTime(fresh.time));
+            $reminderPopup.css('display', 'block');
+            requestAnimationFrame(function () { $reminderPopup.addClass('show'); });
+        }
+
+        function hideReminder() {
+            $reminderPopup.removeClass('show');
+            setTimeout(function () { $reminderPopup.css('display', 'none'); }, 300);
+            currentReminderId = null;
+        }
+
+        $('#reminderDismissBtn').on('click', function () {
+            if (!currentReminderId) return;
+            update(currentReminderId, { status: 'ongoing' });
+            hideReminder();
+            syncUI();
+            setTimeout(checkReminders, 400);
+        });
+
+        $('#reminderCompleteBtn').on('click', function () {
+            if (!currentReminderId) return;
+            update(currentReminderId, { status: 'complete' });
+            hideReminder();
+            syncUI();
+            setTimeout(checkReminders, 400);
+        });
+
+        // ---- Event wiring (view tabs, add, modal, etc.) ----
+        $('#calTabCalendar').on('click', function () { switchView('calendar'); });
+        $('#calTabSchedules').on('click', function () { switchView('schedules'); });
+        $('#addScheduleBtn').on('click', function () { openModal(); });
+        $('#emptyAddBtn').on('click', function () { openModal(); });
+        $('#clearSchedulesBtn').on('click', clearAllSchedules);
+        $saveBtn.on('click', validateAndSave);
+        $cancelBtn.on('click', closeModal);
+        $overlay.on('click', function (e) {
+            if (e.target === this) closeModal();
+        });
+        $(document).on('keydown', function (e) {
+            if (e.key === 'Escape' && $overlay.is(':visible')) closeModal();
+        });
+        // Enter in title selects save
+        $tTitle.on('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); validateAndSave(); }
+        });
+
+        // ---- Sync both views ----
+        function syncUI() {
+            renderSchedules();
+            // Re-render the calendar indicators using the calendar's own render logic.
+            if (window.__calendarRedraw) {
+                window.__calendarRedraw();
+            }
+        }
+
+        // ---- App visibility & periodic checks ----
+        $(document).on('visibilitychange', function () {
+            if (!document.hidden) {
+                checkReminders(true);
+            }
+        });
+        window.addEventListener('focus', function () {
+            checkReminders(true);
+        });
+        setInterval(function () { checkReminders(); }, CHECK_INTERVAL_MS);
+
+        // ---- Day hover tooltip (shows schedules for a date) ----
+        const $dayPopup = $('#schedDayPopup');
+
+        function showDayPopup(dayEl) {
+            const dateKey = $(dayEl).attr('data-date');
+            if (!dateKey) return;
+            const scheds = window.QuickTabScheduler ? window.QuickTabScheduler.getByDate(dateKey) : [];
+            if (!scheds.length) return;
+
+            const html = [];
+            html.push('<p class="sched-day-popup-title"></p>');
+            scheds.forEach(function (s) {
+                html.push(
+                    '<div class="sched-day-popup-item">' +
+                    '<span class="sched-day-popup-dot"></span>' +
+                    '<span class="sched-day-popup-time"></span>' +
+                    '<span class="sched-day-popup-name"></span>' +
+                    '</div>'
+                );
+            });
+
+            $dayPopup.html(html.join(''));
+            $dayPopup.find('.sched-day-popup-title').text(formatDate(dateKey));
+            $dayPopup.find('.sched-day-popup-item').each(function (i) {
+                const s = scheds[i];
+                $(this).find('.sched-day-popup-dot').css('background-color', s.color || COLOR_PRESETS[0]);
+                $(this).find('.sched-day-popup-time').text(formatTime(s.time));
+                $(this).find('.sched-day-popup-name').text(s.title);
+            });
+
+            $dayPopup.css('display', 'block').addClass('show');
+            positionDayPopup(dayEl);
+        }
+
+        function hideDayPopup() {
+            $dayPopup.removeClass('show');
+        }
+
+        function positionDayPopup(dayEl) {
+            const rect = dayEl.getBoundingClientRect();
+            const pw = $dayPopup.outerWidth();
+            const ph = $dayPopup.outerHeight();
+            let left = rect.left + rect.width / 2 - pw / 2;
+            let top = rect.top - ph - 8;
+            if (left < 8) left = 8;
+            if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
+            if (top < 8) top = rect.bottom + 8;
+            $dayPopup.css({ left: left, top: top });
+        }
+
+        const $daysCont = $('.days');
+        $daysCont.on('mouseenter', '.day.has-schedule', function () { showDayPopup(this); });
+        $daysCont.on('mouseleave', '.day.has-schedule', function () { hideDayPopup(); });
+
+        // ---- Expose minimal API (used by calendar for date indicators) ----
+        window.QuickTabScheduler = {
+            getByDate: getByDate,
+            formatDate: formatDate,
+            formatTime: formatTime
+        };
+
+        // ---- Init ----
+        // Restore previously active view (calendar | schedules)
+        try {
+            const savedView = localStorage.getItem(VIEW_KEY);
+            if (savedView === 'schedules') switchView('schedules');
+        } catch (e) { /* ignore */ }
+        // Ensure pre-existing schedules show as calendar indicators (calendar ran first).
+        if (window.__calendarRedraw) window.__calendarRedraw();
+        checkReminders(true);
+    }
 
 
 
@@ -1147,6 +1690,7 @@ $(document).ready(function () {
     notepad();
     calculator();
     calendar();
+    scheduler();
     initMediaController();
 
     // quotes();
@@ -1177,8 +1721,8 @@ function initRevealEffect() {
     document.querySelectorAll(CARDS.join(", ")).forEach(card => {
         card.addEventListener("mousemove", (e) => {
             const rect = card.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width)  * 100;
-            const y = ((e.clientY - rect.top)  / rect.height) * 100;
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
             card.style.setProperty("--x", `${x}%`);
             card.style.setProperty("--y", `${y}%`);
         });

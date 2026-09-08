@@ -145,6 +145,209 @@ $(document).ready(function() {
     }
     bookmarks();
 
+    // SCHEDULES ---------------------------------------------------
+    function schedules() {
+        const SKEY = "quicktab_schedules";
+        const PRESETS = ["#e63e32", "#1176ff", "#22c55e", "#f59e0b", "#8b5cf6", "#ec4899"];
+        const STATUS = ["not_started", "ongoing", "complete"];
+        const STATUS_GLYPH = { "not_started": "&#9744;", "ongoing": "&#9680;", "complete": "&#10003;" };
+        let editingId = null;
+
+        function load() {
+            try {
+                const parsed = JSON.parse(localStorage.getItem(SKEY));
+                if (!Array.isArray(parsed)) return [];
+                return parsed
+                    .filter(function (s) { return s && typeof s === "object"; })
+                    .map(function (s, i) {
+                        return {
+                            id: s.id || ("sch_" + Date.now().toString(36) + "_" + i),
+                            status: STATUS.indexOf(s.status) !== -1 ? s.status : "not_started",
+                            color: (typeof s.color === "string" && s.color) ? s.color : PRESETS[0],
+                            date: typeof s.date === "string" ? s.date : "",
+                            time: typeof s.time === "string" ? s.time : "",
+                            title: typeof s.title === "string" ? s.title : ""
+                        };
+                    })
+                    .sort(function (a, b) {
+                        const ak = a.date + (a.time || "");
+                        const bk = b.date + (b.time || "");
+                        return ak < bk ? -1 : ak > bk ? 1 : 0;
+                    });
+            } catch (e) { return []; }
+        }
+        function save(list) { localStorage.setItem(SKEY, JSON.stringify(list)); }
+
+        function fmtDate(key) {
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) return key || "No date";
+            const p = key.split("-");
+            return p[2] + "/" + p[1] + "/" + p[0];
+        }
+        function fmtTime(t) {
+            if (!t) return "";
+            const p = t.split(":");
+            let h = parseInt(p[0], 10);
+            const m = p[1] || "00";
+            const ap = h >= 12 ? "PM" : "AM";
+            h = h % 12; h = h ? h : 12;
+            return h + ":" + m + " " + ap;
+        }
+        function isOverdue(s) {
+            if (s.status === "complete" || !s.date) return false;
+            return new Date(s.date + "T" + (s.time || "00:00")).getTime() < Date.now();
+        }
+        function statusText(s) {
+            if (s.status === "complete") return "Done";
+            if (s.status === "ongoing") return "Ongoing";
+            return isOverdue(s) ? "Overdue" : "Upcoming";
+        }
+
+        function render() {
+            const list = load();
+            const $list = $("#scheduleList");
+            const $empty = $("#scheduleEmpty");
+            $list.empty();
+            if (!list.length) { $empty.show(); return; }
+            $empty.hide();
+
+            list.forEach(function (s) {
+                const overdue = isOverdue(s);
+                const $li = $("<li>").attr("data-id", s.id);
+                if (overdue) $li.addClass("overdue");
+                if (s.status === "complete") $li.addClass("complete");
+
+                const $dot = $("<span>").addClass("schedule-dot").css("background-color", s.color);
+                const $title = $("<span>").addClass("schedule-title").attr("title", s.title).text(s.title);
+                const $meta = $("<span>").addClass("schedule-meta")
+                    .text(fmtDate(s.date) + " \u00B7 " + fmtTime(s.time));
+                const $tag = $("<span>").addClass("schedule-tag" + (overdue ? " overdue" : ""))
+                    .text(statusText(s));
+                const $status = $("<button>").addClass("schedule-status-btn")
+                    .attr("type", "button")
+                    .attr("title", "Tick / toggle status (click to cycle)")
+                    .html(STATUS_GLYPH[s.status]);
+                const $edit = $("<button>").addClass("schedule-action-btn")
+                    .attr("type", "button").text("Edit");
+                const $del = $("<button>").addClass("schedule-action-btn delete")
+                    .attr("type", "button").text("Delete");
+
+                $li.append($dot, $title, $meta, $tag, $status, $edit, $del);
+                $list.append($li);
+
+                $status.on("click", function () {
+                    const next = STATUS[(STATUS.indexOf(s.status) + 1) % STATUS.length];
+                    updateSchedule(s.id, { status: next });
+                });
+                $edit.on("click", function () { openModal(s.id); });
+                $del.on("click", function () { deleteSchedule(s.id); });
+            });
+        }
+
+        function updateSchedule(id, patch) {
+            const list = load();
+            const idx = list.findIndex(function (x) { return x.id === id; });
+            if (idx === -1) return;
+            list[idx] = Object.assign({}, list[idx], patch);
+            save(list);
+            render();
+        }
+
+        function deleteSchedule(id) {
+            if (!confirm("Delete this schedule?")) return;
+            save(load().filter(function (x) { return x.id !== id; }));
+            render();
+        }
+
+        // ---- Modal ----
+        function buildPalette() {
+            const $pal = $("#schedFieldColors");
+            $pal.empty();
+            PRESETS.forEach(function (c) {
+                $("<button>")
+                    .addClass("schedule-color-swatch")
+                    .css("background-color", c)
+                    .attr("type", "button")
+                    .data("color", c)
+                    .on("click", function () {
+                        $pal.find(".schedule-color-swatch").removeClass("selected");
+                        $(this).addClass("selected");
+                    })
+                    .appendTo($pal);
+            });
+        }
+        function selectedColor() {
+            const sel = $("#schedFieldColors .selected");
+            return sel.length ? sel.data("color") : PRESETS[0];
+        }
+        function openModal(id) {
+            editingId = id || null;
+            const s = id ? load().find(function (x) { return x.id === id; }) : null;
+            $("#scheduleModalTitle").text(s ? "Edit Schedule" : "Add Schedule");
+            $("#schedFieldTitle").val(s ? s.title : "");
+            $("#schedFieldDate").val(s ? s.date : "");
+            $("#schedFieldTime").val(s ? s.time : "");
+            $("#schedFieldStatus").val(s ? s.status : "not_started");
+            buildPalette();
+            const color = s ? s.color : PRESETS[0];
+            $("#schedFieldColors .schedule-color-swatch").each(function () {
+                if ($(this).data("color") === color) $(this).addClass("selected");
+            });
+            $("#scheduleModal").css("display", "flex");
+            requestAnimationFrame(function () { $("#scheduleModal").addClass("show"); });
+            $("#schedFieldTitle").focus();
+        }
+        function closeModal() {
+            $("#scheduleModal").removeClass("show");
+            setTimeout(function () { $("#scheduleModal").css("display", "none"); }, 250);
+            editingId = null;
+        }
+
+        $("#scheduleModalCancel").on("click", closeModal);
+        $("#scheduleModal").on("click", function (e) { if (e.target === this) closeModal(); });
+        $(document).on("keydown", function (e) {
+            if (e.key === "Escape" && $("#scheduleModal").is(":visible")) closeModal();
+        });
+        $("#schedFieldTitle, #schedFieldDate, #schedFieldTime").on("keydown", function (e) {
+            if (e.key === "Enter") $("#scheduleModalSave").trigger("click");
+        });
+
+        $("#scheduleModalSave").on("click", function () {
+            const title = $("#schedFieldTitle").val().trim();
+            const date = $("#schedFieldDate").val();
+            const time = $("#schedFieldTime").val();
+            const status = $("#schedFieldStatus").val();
+            if (!title) { $("#schedFieldTitle").focus(); return; }
+            if (!date) { $("#schedFieldDate").focus(); return; }
+            const patch = { title: title, date: date, time: time, color: selectedColor(), status: status };
+
+            if (editingId) {
+                const list = load();
+                const idx = list.findIndex(function (x) { return x.id === editingId; });
+                if (idx !== -1) {
+                    list[idx] = Object.assign({}, list[idx], patch);
+                    save(list);
+                }
+            } else {
+                const list = load();
+                list.push({
+                    id: "sch_" + Date.now().toString(36) + "_" + Math.floor(Math.random() * 100000).toString(36),
+                    status: patch.status,
+                    color: patch.color,
+                    date: patch.date,
+                    time: patch.time,
+                    title: patch.title
+                });
+                save(list);
+            }
+            closeModal();
+            render();
+        });
+
+        $("#addScheduleBtn").on("click", function () { openModal(null); });
+        render();
+    }
+    schedules();
+
     // WALLPAPER -----------------------------------------------------------
     function wallpaper(){
        let isDynamic = data.settings.wallpaper == "dynamic" ? true : false;

@@ -19,6 +19,7 @@
             <li><a href="#general">General</a></li>
             <li><a href="#personalize">Personalize</a></li>
             <li><a href="#bookmarks">Bookmarks</a></li>
+            <li><a href="#schedules">Schedules</a></li>
             <!-- <li><a href="#widgets">Widgets</a></li> -->
             <li><a href="#about">About</a></li>
         </ul>
@@ -273,6 +274,25 @@
                 
         </section> -->
 
+        <!-- SCHEDULES -->
+        <section id="schedules">
+            <h3>Schedules</h3>
+            <div class="schedule-manager">
+                <div class="schedule-toolbar">
+                    <h4>All Schedules</h4>
+                    <button id="addScheduleBtn">&#43; Add Schedule</button>
+                </div>
+                <div class="schedule-show-container">
+                    <p class="schedule-empty" id="scheduleEmpty">No schedules yet. Click &quot;Add Schedule&quot; to create one.</p>
+                    <ul id="scheduleList">
+
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
         <!-- ABOUT -->
         <section id="about">
             <h3>About</h3>
@@ -292,6 +312,43 @@
 
         <hr>
     </main>
+
+    <!-- SCHEDULE MODAL -->
+    <div class="schedule-modal-overlay" id="scheduleModal" style="display:none;">
+        <div class="schedule-modal">
+            <h3 id="scheduleModalTitle">Add Schedule</h3>
+            <div class="schedule-modal-field">
+                <label for="schedFieldTitle">Title</label>
+                <input type="text" id="schedFieldTitle" placeholder="e.g. Team meeting">
+            </div>
+            <div class="schedule-modal-row">
+                <div class="schedule-modal-field">
+                    <label for="schedFieldDate">Date</label>
+                    <input type="date" id="schedFieldDate">
+                </div>
+                <div class="schedule-modal-field">
+                    <label for="schedFieldTime">Time</label>
+                    <input type="time" id="schedFieldTime">
+                </div>
+            </div>
+            <div class="schedule-modal-field">
+                <label>Color</label>
+                <div class="schedule-color-palette" id="schedFieldColors"></div>
+            </div>
+            <div class="schedule-modal-field">
+                <label for="schedFieldStatus">Status</label>
+                <select id="schedFieldStatus">
+                    <option value="not_started">Not Started</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="complete">Complete</option>
+                </select>
+            </div>
+            <div class="schedule-modal-actions">
+                <button id="scheduleModalCancel">Cancel</button>
+                <button id="scheduleModalSave" class="primary">Save</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 <script src="/res/js/jquery.js"></script>

@@ -25,30 +25,70 @@
                 <!-- CALENDAR -->
                 <div class="calendar-container">
                     <div class="calendar">
-                        <div class="calendar-header">
-                            <h2 id="currentMonth"></h2>
-                            <div>
-                                <button id="prevMonth">
-                                    <img src="../res/logo/anglel.svg" alt="Prev">
-                                </button>
-                                <button id="nextMonth">
-                                    <img src="../res/logo/angler.svg" alt="Next">
-                                </button>
-                            </div>
+
+                        <!-- View Tabs -->
+                        <div class="calendar-tabs" title="Calendar / Schedules">
+                            <button class="cal-tab active" id="calTabCalendar" data-view="calendar">
+                                <span class="cal-tab-label">Calendar</span>
+                            </button>
+                            <button class="cal-tab" id="calTabSchedules" data-view="schedules">
+                                <span class="cal-tab-label">Schedules</span>
+                            </button>
                         </div>
-                        <div class="calendar-body">
-                            <div class="weekdays">
-                                <div>Sun</div>
-                                <div>Mon</div>
-                                <div>Tue</div>
-                                <div>Wed</div>
-                                <div>Thu</div>
-                                <div>Fri</div>
-                                <div>Sat</div>
+
+                        <!-- View: Calendar -->
+                        <div class="calendar-views">
+                            <div class="calendar-view" id="calendarView">
+                                <div class="calendar-header">
+                                    <h2 id="currentMonth"></h2>
+                                    <div>
+                                        <button id="prevMonth">
+                                            <img src="../res/logo/anglel.svg" alt="Prev">
+                                        </button>
+                                        <button id="nextMonth">
+                                            <img src="../res/logo/angler.svg" alt="Next">
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="calendar-body">
+                                    <div class="weekdays">
+                                        <div>Sun</div>
+                                        <div>Mon</div>
+                                        <div>Tue</div>
+                                        <div>Wed</div>
+                                        <div>Thu</div>
+                                        <div>Fri</div>
+                                        <div>Sat</div>
+                                    </div>
+
+                                    <div class="days"></div>
+                                </div>
                             </div>
 
-                            <div class="days"></div>
+                            <!-- View: Schedules -->
+                            <div class="calendar-view" id="schedulesView">
+                                <div class="schedules-header">
+                                    <h2 id="schedulesTitle">Schedules</h2>
+                                    <div>
+                                        <button class="sched-btn" id="clearSchedulesBtn" title="Clear All">
+                                            <img src="../res/logo/delete.png" alt="Clear All">
+                                        </button>
+                                        <button class="sched-btn" id="addScheduleBtn" title="Add Schedule">
+                                            <img src="../res/logo/add.svg" alt="Add">
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="schedules-body">
+                                    <ul id="schedulesList"></ul>
+                                    <div class="schedules-empty" id="schedulesEmpty" style="display:none;">
+                                        <p>No schedules yet</p>
+                                        <span>Plan your next task or meeting.</span>
+                                        <button id="emptyAddBtn">+ Add Schedule</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -248,6 +288,50 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- SCHEDULE DAY POPUP -->
+    <div class="sched-day-popup" id="schedDayPopup" style="display:none;"></div>
+
+    <!-- SCHEDULE MODAL -->
+    <div class="scheduler-modal-overlay" id="schedulerModalOverlay" style="display:none;">
+        <div class="scheduler-modal">
+            <h2 class="scheduler-modal-title" id="scheduleModalTitle">Add Schedule</h2>
+            <div class="scheduler-field">
+                <label for="schedTitle">Title</label>
+                <input type="text" id="schedTitle" placeholder="Event Title" autocomplete="off">
+            </div>
+            <div class="scheduler-field">
+                <label for="schedDate">Date</label>
+                <input type="date" id="schedDate">
+            </div>
+            <div class="scheduler-field">
+                <label for="schedTime">Time</label>
+                <input type="time" id="schedTime">
+            </div>
+            <div class="scheduler-field">
+                <label>Color</label>
+                <div class="sched-color-row" id="schedColorRow"></div>
+            </div>
+            <div class="scheduler-modal-actions">
+                <button class="sched-modal-btn cancel" id="scheduleCancelBtn">Cancel</button>
+                <button class="sched-modal-btn save" id="scheduleSaveBtn">Add Schedule</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REMINDER POPUP -->
+    <div class="reminder-popup" id="reminderPopup" style="display:none;">
+        <p class="reminder-title">Schedule approaching</p>
+        <div class="reminder-item">
+            <span class="reminder-dot" id="reminderDot"></span>
+            <span class="reminder-name" id="reminderName"></span>
+        </div>
+        <p class="reminder-meta" id="reminderMeta"></p>
+        <div class="reminder-actions">
+            <button class="reminder-btn dismiss" id="reminderDismissBtn">Dismiss</button>
+            <button class="reminder-btn complete" id="reminderCompleteBtn">Complete</button>
         </div>
     </div>
 </body>
