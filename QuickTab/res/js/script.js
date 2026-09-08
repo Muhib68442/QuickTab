@@ -171,6 +171,13 @@ $(document).ready(function () {
                     const weatherIcon = document.getElementById('weatherIcon');
                     const iconCode = data.weather[0].icon;
                     weatherIcon.src = `http://openweathermap.org/img/wn/${iconCode}.png`; // You can use your own icons as well
+
+                    // expose weather for themes (e.g. theme6 date row)
+                    window.quicktabWeather = {
+                        temp: parseInt(data.main.temp) + '°C',
+                        location: data.name,
+                        icon: 'https://openweathermap.org/img/wn/' + iconCode + '.png'
+                    };
                 })
                 .catch(error => {
                     console.error('Error fetching weather data:', error);
@@ -223,17 +230,41 @@ $(document).ready(function () {
             let minutes = now.getMinutes();
             minutes = minutes < 10 ? '0' + minutes : minutes;
 
+            const timeEl = selectedTheme === "theme6" ? "#clock" : "#time";
+
             if (data.settings.timeFormat == "24") {
-                $("#time").text(hours + ':' + minutes);
+                $(timeEl).text(hours + ':' + minutes);
             } else {
                 let ampm = hours >= 12 ? 'PM' : 'AM';
                 let displayHours = hours % 12;
                 displayHours = displayHours ? displayHours : 12;
-                $("#time").text(displayHours + ':' + minutes + ' ' + ampm);
+                $(timeEl).text(displayHours + ':' + minutes + ' ' + ampm);
             }
 
-            const options = { weekday: 'long', month: 'long', day: 'numeric' };
-            $("#date").text(now.toLocaleDateString('en-US', options));
+            // GREETING (theme6)
+            if (selectedTheme === "theme6") {
+                let greeting;
+                if (hours >= 5 && hours < 12) greeting = 'Good morning';
+                else if (hours >= 12 && hours < 17) greeting = 'Good afternoon';
+                else if (hours >= 17 && hours < 21) greeting = 'Good evening';
+                else greeting = 'Good night';
+                $('#greeting-label').text(greeting);
+            }
+
+            // DATE (full date + weather for theme6)
+            if (selectedTheme === "theme6") {
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                $("#date").text(now.toLocaleDateString('en-US', options));
+
+                const w = window.quicktabWeather;
+                if (w) {
+                    $("#date-weather-icon").attr("src", w.icon).show();
+                    $("#date-weather-text").text(w.temp + ', ' + w.location);
+                }
+            } else {
+                const options = { weekday: 'long', month: 'long', day: 'numeric' };
+                $("#date").text(now.toLocaleDateString('en-US', options));
+            }
         }
         updateTimeDate();
         setInterval(updateTimeDate, 1000);
@@ -246,7 +277,7 @@ $(document).ready(function () {
         })
 
         // SEARCH 
-        $(".searchbar input").on("keypress", function (e) {
+        $(".searchbar input, #module-search").on("keypress", function (e) {
             if (e.which === 13) { // Enter key
                 let query = $(this).val().trim();
                 if (!query) return;
@@ -285,7 +316,11 @@ $(document).ready(function () {
         console.log("Theme JS Loaded");
 
         // Add smooth transition to UI elements
-        $("#time, #date, .searchbar").css("opacity", "0").addClass("fade-in");
+        if (selectedTheme === "theme6") {
+            $("#greeting-label, #clock, .date-row, #module-search").css("opacity", "0").addClass("fade-in");
+        } else {
+            $("#time, #date, .searchbar").css("opacity", "0").addClass("fade-in");
+        }
 
         // Don't auto-focus the searchbar — keeps address bar blank like Chrome's default new tab
 
@@ -1277,7 +1312,7 @@ $(document).ready(function () {
                     openModal(s.id);
                 });
 
-$list.append($li);
+                $list.append($li);
             });
         }
 

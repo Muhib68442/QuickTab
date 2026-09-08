@@ -708,4 +708,270 @@ body::-webkit-scrollbar {
   transition: 0.1s;
   background-color: #000;
   color: #fff;
+}
+
+/* ================= SCHEDULES (settings page) ================= */
+.settings-main #schedules {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.settings-main #schedules h3 {
+  font-family: fontSB;
+  font-size: 26px;
+  color: #000;
+  margin-bottom: 30px;
+}
+.settings-main #schedules .schedule-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.settings-main #schedules .schedule-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.settings-main #schedules .schedule-toolbar h4 {
+  font-family: fontSB;
+  font-size: 20px;
+  color: #000;
+  font-weight: 400;
+}
+.settings-main #schedules .schedule-toolbar button {
+  background-color: var(--bg-secondary);
+  border-radius: 5px;
+  padding: 8px 18px;
+  border: none;
+  outline: none;
+  color: #000;
+  font-family: fontM;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.1s;
+}
+.settings-main #schedules .schedule-toolbar button:hover {
+  transition: 0.1s;
+  background-color: #000;
+  color: #fff;
+}
+.settings-main #schedules .schedule-show-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.settings-main #schedules .schedule-empty {
+  font-family: fontM;
+  font-size: 16px;
+  color: #666;
+  padding: 12px 0;
+}
+.settings-main #schedules #scheduleList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.settings-main #schedules #scheduleList li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background-color: var(--bg-secondary);
+  color: #000;
+  font-family: fontM;
+  transition: 0.1s;
+}
+.settings-main #schedules #scheduleList li:hover {
+  transition: 0.1s;
+  background-color: rgba(0, 0, 0, 0.08);
+}
+.settings-main #schedules #scheduleList li.complete {
+  opacity: 0.55;
+}
+.settings-main #schedules #scheduleList li.complete .schedule-title {
+  text-decoration: line-through;
+}
+.settings-main #schedules #scheduleList li .schedule-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.settings-main #schedules #scheduleList li .schedule-title {
+  font-family: fontM;
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40%;
+}
+.settings-main #schedules #scheduleList li .schedule-meta {
+  font-size: 13px;
+  opacity: 0.6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.settings-main #schedules #scheduleList li .schedule-tag {
+  margin-left: auto;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.06);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.settings-main #schedules #scheduleList li .schedule-tag.overdue {
+  color: #c0392b;
+  background: rgba(192, 57, 43, 0.12);
+}
+.settings-main #schedules #scheduleList li .schedule-status-btn {
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 6px;
+  color: #000;
+  flex-shrink: 0;
+}
+.settings-main #schedules #scheduleList li .schedule-action-btn {
+  background-color: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 5px;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-family: fontM;
+  font-size: 14px;
+  color: #000;
+  flex-shrink: 0;
+  transition: 0.1s;
+}
+.settings-main #schedules #scheduleList li .schedule-action-btn:hover {
+  background-color: #000;
+  border-color: #000;
+  color: #fff;
+}
+.settings-main #schedules #scheduleList li .schedule-action-btn.delete:hover {
+  background-color: tomato;
+  border-color: tomato;
+  color: #fff;
+}
+
+/* schedule modal (settings page) */
+.settings-body .schedule-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.settings-body .schedule-modal-overlay.show {
+  opacity: 1;
+}
+.settings-body .schedule-modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  width: 90%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  transform: translateY(16px);
+  transition: transform 0.25s ease;
+}
+.settings-body .schedule-modal-overlay.show .schedule-modal {
+  transform: translateY(0);
+}
+.settings-body .schedule-modal h3 {
+  font-family: fontSB;
+  font-size: 20px;
+  color: #000;
+  margin-bottom: 18px;
+}
+.settings-body .schedule-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.settings-body .schedule-modal-field label {
+  font-family: fontM;
+  font-size: 14px;
+  color: #000;
+}
+.settings-body .schedule-modal-field input,
+.settings-body .schedule-modal-field select {
+  font-family: fontM;
+  font-size: 15px;
+  color: #000;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 2px solid #e2e2e2;
+  outline: none;
+  transition: 0.1s;
+}
+.settings-body .schedule-modal-field input:focus,
+.settings-body .schedule-modal-field select:focus {
+  border-color: #000;
+}
+.settings-body .schedule-modal-row {
+  display: flex;
+  gap: 12px;
+}
+.settings-body .schedule-modal-row .schedule-modal-field {
+  flex: 1;
+}
+.settings-body .schedule-color-palette {
+  display: flex;
+  gap: 8px;
+}
+.settings-body .schedule-color-swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.settings-body .schedule-color-swatch.selected {
+  border-color: #000;
+  transform: scale(1.1);
+}
+.settings-body .schedule-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+.settings-body .schedule-modal-actions button {
+  font-family: fontM;
+  font-size: 15px;
+  padding: 8px 18px;
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  color: #000;
+  border: none;
+  cursor: pointer;
+  transition: 0.1s;
+}
+.settings-body .schedule-modal-actions button:hover {
+  background: #000;
+  color: #fff;
+}
+.settings-body .schedule-modal-actions button.primary {
+  background: #000;
+  color: #fff;
+}
+.settings-body .schedule-modal-actions button.primary:hover {
+  opacity: 0.85;
 }/*# sourceMappingURL=main.css.map */
