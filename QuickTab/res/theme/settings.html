@@ -19,6 +19,7 @@
             <li><a href="#general">General</a></li>
             <li><a href="#personalize">Personalize</a></li>
             <li><a href="#bookmarks">Bookmarks</a></li>
+            <li><a href="#tasks">Tasks</a></li>
             <li><a href="#schedules">Schedules</a></li>
             <li><a href="#tinyapps">TinyApps</a></li>
             <!-- <li><a href="#widgets">Widgets</a></li> -->
@@ -269,6 +270,33 @@
 
         <hr>
 
+        <!-- TASKS -->
+        <section id="tasks">
+            <h3>Tasks</h3>
+            <div class="task-manager">
+                <div class="task-group">
+                    <div class="task-toolbar">
+                        <h4>Todo List</h4>
+                        <button id="addTodoTaskBtn">&#43; Add Task</button>
+                    </div>
+                    <p class="task-empty" id="todoTaskEmpty">No todo tasks yet. Click &quot;Add Task&quot; to create one.</p>
+                    <ul class="task-list" id="todoTaskList"></ul>
+                </div>
+
+                <div class="task-group">
+                    <div class="task-toolbar">
+                        <h4>Priority Planner</h4>
+                        <button id="addPlannerTaskBtn">&#43; Add Plan</button>
+                    </div>
+                    <div class="task-drag-hint">Drag the handle or use the arrows to set your execution order. Default status is Not Started.</div>
+                    <p class="task-empty" id="plannerTaskEmpty">No plans yet. Click &quot;Add Plan&quot; to create one.</p>
+                    <ul class="task-list" id="plannerTaskList"></ul>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
         <!-- WIDGETS -->
         <!-- <section id="widgets">
             <h3>Widgets</h3>
@@ -378,6 +406,31 @@
             <div class="schedule-modal-actions">
                 <button id="scheduleModalCancel">Cancel</button>
                 <button id="scheduleModalSave" class="primary">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TASK MODAL -->
+    <div class="schedule-modal-overlay" id="taskModal" style="display:none;">
+        <div class="schedule-modal">
+            <h3 id="taskModalTitle">Add Task</h3>
+            <div class="schedule-modal-field">
+                <label for="taskFieldName">Task Name</label>
+                <input type="text" id="taskFieldName" placeholder="e.g. Finish CIMS presentation">
+            </div>
+            <div class="schedule-modal-field" id="taskFieldStatusWrap">
+                <label for="taskFieldStatus">Status</label>
+                <select id="taskFieldStatus">
+                    <option value="not_started">Not Started</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="completed">Completed</option>
+                    <option value="pending">Pending</option>
+                    <option value="deferred">Deferred</option>
+                </select>
+            </div>
+            <div class="schedule-modal-actions">
+                <button id="taskModalCancel">Cancel</button>
+                <button id="taskModalSave" class="primary">Save</button>
             </div>
         </div>
     </div>

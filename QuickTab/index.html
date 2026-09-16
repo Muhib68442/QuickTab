@@ -269,20 +269,47 @@
                 <div class="todo-container">
                     <div class="todo-heading">
                         <img src="../res/logo/todo.svg" alt="todo">
+                        <!-- View Tabs -->
+                        <div class="todo-tabs" title="Todo / Priority Planner">
+                            <button class="cal-tab active" id="todoTabList" data-view="list">
+                                <span class="cal-tab-label">List</span>
+                            </button>
+                            <button class="cal-tab" id="todoTabPlanner" data-view="planner">
+                                <span class="cal-tab-label">Planner</span>
+                            </button>
+                        </div>
                         <img src="../res/logo/delete.png" alt="del" id="deleteAllTaskBtn">
                     </div>
-                    <div class="todo-body">
-                        <ul>
-                            <!-- <li> 
-                                <div class="todo-task">
-                                    <span class="todo-check"></span>
-                                    <p class="taskName">No Task</p>
-                                </div> 
-                                
-                                <img src="../res/logo/close.svg" alt="delete">
-                            </li> -->
-                        </ul>
 
+                    <div class="todo-views">
+                        <div class="todo-views-track">
+                        <!-- View: List -->
+                        <div class="todo-view" id="todoListView">
+                            <div class="todo-body">
+                                <ul>
+                                    <!-- <li> 
+                                        <div class="todo-task">
+                                            <span class="todo-check"></span>
+                                            <p class="taskName">No Task</p>
+                                        </div> 
+                                        
+                                        <img src="../res/logo/close.svg" alt="delete">
+                                    </li> -->
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- View: Priority Planner -->
+                        <div class="todo-view" id="todoPlannerView">
+                            <div class="planner-body">
+                                <ul id="plannerList"></ul>
+                                <div class="planner-empty" id="plannerEmpty" style="display:none;">
+                                    <p>Your queue is empty</p>
+                                    <span>Drag tasks to order them the way you want to execute them.</span>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
                     </div>
 
                     <div class="todo-addTaskBody">

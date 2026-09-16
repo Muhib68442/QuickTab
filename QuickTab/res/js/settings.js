@@ -45,6 +45,10 @@ $(document).ready(function() {
 
             ],
 
+            "planner": [
+
+            ],
+
             "notepad": {
                 "tabs": [
                     { "id": "nt_1", "name": "Tab 1", "content": "Welcome to QuickTab!" }
@@ -144,6 +148,256 @@ $(document).ready(function() {
         });
     }
     bookmarks();
+
+    // TASKS ---------------------------------------------------
+    function tasks() {
+        const STATUS = ["not_started", "ongoing", "completed", "pending", "deferred"];
+        const STATUS_LABEL = {
+            "not_started": "Not Started",
+            "ongoing": "Ongoing",
+            "pending": "Pending",
+            "deferred": "Deferred",
+            "completed": "Completed"
+        };
+        const STATUS_COLOR = {
+            "not_started": "#94a3b8",
+            "ongoing": "#1176ff",
+            "pending": "#f59e0b",
+            "deferred": "#e63e32",
+            "completed": "#22c55e"
+        };
+        let editingId = null;
+        let editingTarget = null; // "todo" | "planner"
+
+        function getTodo() { return data.todo || []; }
+        function getPlanner() {
+            const arr = data.planner || [];
+            arr.forEach(function (t) {
+                if (t && typeof t === "object" && STATUS.indexOf(t.status) === -1) {
+                    t.status = t.completed ? "completed" : "not_started";
+                }
+            });
+            return arr;
+        }
+        function save() { localStorage.setItem(key, JSON.stringify(data)); }
+        function genId() {
+            return "t_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+        }
+
+        // ---- Todo list ----
+        function renderTodo() {
+            const list = getTodo();
+            const $list = $("#todoTaskList");
+            const $empty = $("#todoTaskEmpty");
+            $list.empty();
+            if (!list.length) { $empty.show(); return; }
+            $empty.hide();
+
+            list.forEach(function (t) {
+                const $li = $("<li>").attr("data-id", t.id);
+                if (t.completed) $li.addClass("is-completed");
+
+                const $dot = $("<span>").addClass("task-dot").css("background-color", t.completed ? STATUS_COLOR.completed : "#94a3b8");
+                const $name = $("<span>").addClass("task-name").attr("title", t.name).text(t.name);
+                const $toggle = $("<button>").addClass("task-action-btn toggle-done").attr("type", "button")
+                    .text(t.completed ? "Completed" : "Open");
+                const $edit = $("<button>").addClass("task-action-btn").attr("type", "button").text("Edit");
+                const $del = $("<button>").addClass("task-action-btn delete").attr("type", "button").text("Delete");
+
+                $li.append($dot, $name, $toggle, $edit, $del);
+                $list.append($li);
+
+                $toggle.on("click", function () { toggleTodo(t.id); });
+                $edit.on("click", function () { openModal("todo", t.id); });
+                $del.on("click", function () { removeTask("todo", t.id); });
+            });
+        }
+
+        function toggleTodo(id) {
+            const list = getTodo();
+            const t = list.find(function (x) { return x.id === id; });
+            if (!t) return;
+            t.completed = !t.completed;
+            save();
+            renderTodo();
+        }
+
+        // ---- Planner list ----
+        function renderPlanner() {
+            const list = getPlanner();
+            const $list = $("#plannerTaskList");
+            const $empty = $("#plannerTaskEmpty");
+            $list.empty();
+            if (!list.length) { $empty.show(); return; }
+            $empty.hide();
+
+            list.forEach(function (t, i) {
+                const st = STATUS.indexOf(t.status) !== -1 ? t.status : "not_started";
+                const color = STATUS_COLOR[st];
+                const $li = $("<li>").attr("data-id", t.id);
+                if (st === "completed") $li.addClass("is-completed");
+
+                const $grip = $("<span>").addClass("task-grip").attr("title", "Drag to reorder").text("\u2630");
+                const $dot = $("<span>").addClass("task-dot").css("background-color", color);
+                const $name = $("<span>").addClass("task-name").attr("title", t.name).text(t.name);
+                const $tag = $("<span>").addClass("task-status-tag").css("color", color).css("border-color", color).text(STATUS_LABEL[st]);
+                const $up = $("<button>").addClass("task-action-btn move-up").attr("type", "button").attr("title", "Move up").html("&#8593;");
+                const $down = $("<button>").addClass("task-action-btn move-down").attr("type", "button").attr("title", "Move down").html("&#8595;");
+                const $edit = $("<button>").addClass("task-action-btn").attr("type", "button").text("Edit");
+                const $del = $("<button>").addClass("task-action-btn delete").attr("type", "button").text("Delete");
+
+                $li.append($grip, $dot, $name, $tag, $up, $down, $edit, $del);
+                $list.append($li);
+
+                $up.on("click", function () { movePlanner(i, -1); });
+                $down.on("click", function () { movePlanner(i, 1); });
+                $edit.on("click", function () { openModal("planner", t.id); });
+                $del.on("click", function () { removeTask("planner", t.id); });
+            });
+        }
+
+        function movePlanner(index, dir) {
+            const list = getPlanner();
+            const target = index + dir;
+            if (target < 0 || target >= list.length) return;
+            const tmp = list[index];
+            list[index] = list[target];
+            list[target] = tmp;
+            save();
+            renderPlanner();
+        }
+
+        function removeTask(target, id) {
+            if (!confirm("Delete this task?")) return;
+            if (target === "todo") {
+                data.todo = getTodo().filter(function (t) { return t.id !== id; });
+            } else {
+                data.planner = getPlanner().filter(function (t) { return t.id !== id; });
+            }
+            save();
+            renderAll();
+        }
+
+        function renderAll() { renderTodo(); renderPlanner(); }
+
+        // ---- Modal ----
+        function openModal(target, id) {
+            editingTarget = target || "todo";
+            editingId = id || null;
+            const isPlanner = editingTarget === "planner";
+            const t = id
+                ? (isPlanner ? getPlanner() : getTodo()).find(function (x) { return x.id === id; })
+                : null;
+            $("#taskModalTitle").text(t ? (isPlanner ? "Edit Plan" : "Edit Task") : (isPlanner ? "Add Plan" : "Add Task"));
+            $("#taskFieldName").val(t ? t.name : "");
+            if (isPlanner) $("#taskFieldStatus").val(t ? t.status : "not_started");
+            $("#taskFieldStatusWrap").toggle(isPlanner);
+            $("#taskModal").css("display", "flex");
+            requestAnimationFrame(function () { $("#taskModal").addClass("show"); });
+            $("#taskFieldName").focus();
+        }
+        function closeModal() {
+            $("#taskModal").removeClass("show");
+            setTimeout(function () { $("#taskModal").css("display", "none"); }, 250);
+            editingId = null;
+        }
+
+        $("#taskModalCancel").on("click", closeModal);
+        $("#taskModal").on("click", function (e) { if (e.target === this) closeModal(); });
+        $(document).on("keydown", function (e) {
+            if (e.key === "Escape" && $("#taskModal").is(":visible")) closeModal();
+        });
+        $("#taskFieldName").on("keydown", function (e) {
+            if (e.key === "Enter") $("#taskModalSave").trigger("click");
+        });
+
+        $("#taskModalSave").on("click", function () {
+            const name = $("#taskFieldName").val().trim();
+            const status = $("#taskFieldStatus").val();
+            if (!name) { $("#taskFieldName").focus(); return; }
+
+            if (editingTarget === "planner") {
+                const list = getPlanner();
+                if (editingId) {
+                    const idx = list.findIndex(function (x) { return x.id === editingId; });
+                    if (idx !== -1) {
+                        list[idx].name = name;
+                        list[idx].status = status;
+                        save();
+                    }
+                } else {
+                    data.planner = list.concat({ id: genId(), name: name, status: status });
+                    save();
+                }
+            } else {
+                const list = getTodo();
+                if (editingId) {
+                    const idx = list.findIndex(function (x) { return x.id === editingId; });
+                    if (idx !== -1) { list[idx].name = name; save(); }
+                } else {
+                    data.todo = list.concat({ id: genId(), name: name, completed: false });
+                    save();
+                }
+            }
+            closeModal();
+            renderAll();
+        });
+
+        $("#addTodoTaskBtn").on("click", function () { openModal("todo", null); });
+        $("#addPlannerTaskBtn").on("click", function () { openModal("planner", null); });
+
+        // Drag & drop reorder in settings (planner only)
+        $("#plannerTaskList").on("pointerdown", ".task-grip", function (e) {
+            if (e.button !== 0) return;
+            e.preventDefault();
+            const $li = $(this).closest("li");
+            const $list = $("#plannerTaskList");
+            const startY = e.clientY;
+            let moved = false;
+
+            function onMove(ev) {
+                if (!moved && Math.abs(ev.clientY - startY) < 5) return;
+                if (!moved) {
+                    moved = true;
+                    $li.addClass("dragging");
+                    document.body.style.userSelect = "none";
+                }
+                const items = $list.children("li").get();
+                const fromIdx = items.indexOf($li[0]);
+                let toIdx = items.length;
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i] === $li[0]) continue;
+                    const r = items[i].getBoundingClientRect();
+                    if (ev.clientY < r.top + r.height / 2) { toIdx = i; break; }
+                }
+                if (toIdx > fromIdx) toIdx -= 1;
+                if (fromIdx !== toIdx) {
+                    if (fromIdx < toIdx) $list[0].insertBefore(items[fromIdx], items[toIdx + 1]);
+                    else $list[0].insertBefore(items[fromIdx], items[toIdx]);
+                }
+            }
+
+            function onUp() {
+                document.removeEventListener("pointermove", onMove);
+                document.removeEventListener("pointerup", onUp);
+                document.body.style.userSelect = "";
+                if (moved) {
+                    $li.removeClass("dragging");
+                    const order = $list.children("li").get().map(function (el) { return $(el).data("id"); });
+                    const byId = {};
+                    getPlanner().forEach(function (t) { byId[t.id] = t; });
+                    data.planner = order.map(function (id) { return byId[id]; }).filter(Boolean);
+                    save();
+                }
+            }
+
+            document.addEventListener("pointermove", onMove);
+            document.addEventListener("pointerup", onUp);
+        });
+
+        renderAll();
+    }
+    tasks();
 
     // SCHEDULES ---------------------------------------------------
     function schedules() {

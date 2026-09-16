@@ -44,6 +44,10 @@ $(document).ready(function () {
 
             ],
 
+            "planner": [
+
+            ],
+
             "notepad": {
                 "tabs": [
                     { "id": "nt_1", "name": "Tab 1", "content": "Welcome to QuickTab!" }
@@ -614,12 +618,38 @@ $(document).ready(function () {
 
     ////////// TO DO LIST //////////
     function todo() {
-        function getTasks() {
+
+        const TODO_VIEW_KEY = 'quicktab_todo_view';
+        const PLANNER_STATUS = {
+            completed:  { label: 'Completed',   color: '#22c55e' },
+            ongoing:    { label: 'Ongoing',     color: '#1176ff' },
+            pending:    { label: 'Pending',     color: '#f59e0b' },
+            not_started:{ label: 'Not Started', color: '#94a3b8' },
+            deferred:   { label: 'Deferred',    color: '#e63e32' }
+        };
+        const PLANNER_STATUS_KEYS = ['not_started', 'ongoing', 'completed', 'pending', 'deferred'];
+
+        function getTodoTasks() {
             return data.todo || [];
         }
 
-        function saveTasks(tasks) {
+        function saveTodoTasks(tasks) {
             data.todo = tasks;
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        function getPlannerTasks() {
+            const arr = data.planner || [];
+            arr.forEach(function (t) {
+                if (t && typeof t === 'object' && PLANNER_STATUS_KEYS.indexOf(t.status) === -1) {
+                    t.status = 'not_started';
+                }
+            });
+            return arr;
+        }
+
+        function savePlannerTasks(tasks) {
+            data.planner = tasks;
             localStorage.setItem(key, JSON.stringify(data));
         }
 
@@ -627,74 +657,408 @@ $(document).ready(function () {
             return 't_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
         }
 
-        function addTask(taskName) {
-            const tasks = getTasks();
-            const task_id = generateId();
-            tasks.push({ id: task_id, name: taskName, completed: false });
-            saveTasks(tasks);
-
-            const $li = $(`
-            <li style="display:none;" data-id="${task_id}">
-                <div class="todo-task">
-                    <span class="todo-check"></span>
-                    <input class="taskName" data-id="${task_id}" value="${taskName}" title="${taskName}" readonly>
-                </div>
-                <img src="../res/logo/close.svg" class="deleteTask" alt="delete">
-            </li>
-        `);
-            $('.todo-body ul').append($li);
-            $li.slideDown(200);
+        function isPlannerView() {
+            return $('.todo-views').hasClass('show-planner');
         }
 
-        function removeTask(task_id) {
-            let tasks = getTasks();
-            tasks = tasks.filter(t => t.id !== task_id);
-            saveTasks(tasks);
-
-            const $li = $(`li[data-id='${task_id}']`);
-            $li.slideUp(200, function () {
-                $(this).remove();
-            });
-        }
-
-        function toggleTaskCompletion(task_id) {
-            const tasks = getTasks();
-            const task = tasks.find(t => t.id === task_id);
-            if (task) {
-                task.completed = !task.completed;
-                saveTasks(tasks);
-                displayTasks();
-            }
-        }
-
-        function displayTasks() {
-            const tasks = getTasks();
+        // ---- Rendering ----
+        function renderTodoList() {
+            const tasks = getTodoTasks();
             const $list = $('.todo-body ul');
             $list.empty();
-            tasks.forEach(task => {
-                const $li = $(`
-                <li data-id="${task.id}">
-                    <div class="todo-task">
-                        <span class="todo-check ${task.completed ? 'completed' : ''}"></span>
-                        <input class="taskName ${task.completed ? 'completed' : ''}" data-id="${task.id}" value="${task.name}" title="${task.name}" readonly>
-                    </div>
-                    <img src="../res/logo/close.svg" class="deleteTask" alt="delete">
-                </li>
-            `);
+            tasks.forEach(function (task) {
+                const $li = $('<li>').attr('data-id', task.id);
+                const $div = $('<div>').addClass('todo-task');
+                $('<span>').addClass('todo-check' + (task.completed ? ' completed' : '')).appendTo($div);
+                $('<input>').addClass('taskName' + (task.completed ? ' completed' : ''))
+                    .attr({ 'data-id': task.id, value: task.name, title: task.name, readonly: true })
+                    .appendTo($div);
+                $div.appendTo($li);
+                $('<img>').attr({ src: '../res/logo/close.svg', alt: 'delete' }).addClass('deleteTask').appendTo($li);
                 $list.append($li);
             });
         }
 
-        // Toggle completion
-        $('.todo-body ul').off("click", ".todo-check").on('click', '.todo-check', function () {
-            const task_id = $(this).closest('li').data('id');
-            toggleTaskCompletion(task_id);
+        function buildStatusSelect(status) {
+            const $select = $('<select>').addClass('planner-status').attr('title', 'Change status');
+            PLANNER_STATUS_KEYS.forEach(function (k) {
+                const $opt = $('<option>').val(k).text(PLANNER_STATUS[k].label);
+                if (k === status) $opt.prop('selected', true);
+                $select.append($opt);
+            });
+            return $select;
+        }
+
+        function updatePlannerEmpty() {
+            const $list = $('#plannerList');
+            const $empty = $('#plannerEmpty');
+            if ($list.children('li').length) {
+                $list.show();
+                $empty.hide();
+            } else {
+                $list.hide();
+                $empty.show();
+            }
+        }
+
+        function buildPlannerNameWrap(name) {
+            const $wrap = $('<span>').addClass('planner-name-wrap');
+            const $marquee = $('<span>').addClass('planner-name-marquee');
+            const $name = $('<span>').addClass('planner-name').attr('title', name).text(name);
+            $marquee.append($name);
+            $wrap.append($marquee);
+            return $wrap;
+        }
+
+        function setupPlannerNameMarquee($wrap) {
+            if (!$wrap.length) return;
+            const avail = $wrap[0].clientWidth;
+            if (avail <= 0) return;
+            if ($wrap[0].scrollWidth > avail) {
+                $wrap.addClass('overflow');
+                const name = $wrap.find('.planner-name').first().text();
+                const $clone = $('<span>').addClass('planner-name planner-name-clone').text(name);
+                $wrap.find('.planner-name-marquee').append($clone);
+            }
+        }
+
+        function renderPlanner() {
+            const tasks = getPlannerTasks();
+            const $list = $('#plannerList');
+            $list.empty();
+
+            if (!tasks.length) {
+                updatePlannerEmpty();
+                return;
+            }
+
+            tasks.forEach(function (task) {
+                const status = (task.status && PLANNER_STATUS[task.status]) ? task.status : 'not_started';
+                const $li = $('<li>').addClass('planner-item status-' + status).attr('data-id', task.id);
+                if (status === 'completed') $li.addClass('is-completed');
+
+                $('<span>').addClass('planner-handle').attr('title', 'Drag to reorder').appendTo($li);
+                buildStatusSelect(status).appendTo($li);
+                const $wrap = buildPlannerNameWrap(task.name);
+                $wrap.appendTo($li);
+                $('<img>').attr({ src: '../res/logo/close.svg', alt: 'delete' }).addClass('planner-delete').appendTo($li);
+
+                $list.append($li);
+                setupPlannerNameMarquee($wrap);
+            });
+
+            updatePlannerEmpty();
+        }
+
+        function syncAll() {
+            renderTodoList();
+            renderPlanner();
+        }
+
+        // ---- View switching ----
+        function switchView(view) {
+            localStorage.setItem(TODO_VIEW_KEY, view);
+            if (view === 'planner') {
+                $('.todo-views').addClass('show-planner');
+                $('#todoTabList').removeClass('active');
+                $('#todoTabPlanner').addClass('active');
+                renderPlanner();
+            } else {
+                $('.todo-views').removeClass('show-planner');
+                $('#todoTabPlanner').removeClass('active');
+                $('#todoTabList').addClass('active');
+                renderTodoList();
+            }
+        }
+
+        // ---- Task operations ----
+        function addTask(taskName) {
+            const task_id = generateId();
+            if (isPlannerView()) {
+                const tasks = getPlannerTasks();
+                tasks.push({ id: task_id, name: taskName, status: 'not_started' });
+                savePlannerTasks(tasks);
+
+                const $li = $('<li>').addClass('planner-item status-not_started').attr('data-id', task_id).css('display', 'none');
+                $('<span>').addClass('planner-handle').attr('title', 'Drag to reorder').appendTo($li);
+                buildStatusSelect('not_started').appendTo($li);
+                const $nameWrap = buildPlannerNameWrap(taskName);
+                $nameWrap.appendTo($li);
+                $('<img>').attr({ src: '../res/logo/close.svg', alt: 'delete' }).addClass('planner-delete').appendTo($li);
+                $('#plannerList').append($li);
+                $('#plannerList').show();
+                $('#plannerEmpty').hide();
+                $li.slideDown(200, function () { setupPlannerNameMarquee($nameWrap); });
+            } else {
+                const tasks = getTodoTasks();
+                tasks.push({ id: task_id, name: taskName, completed: false });
+                saveTodoTasks(tasks);
+
+                const $li = $('<li>').attr('data-id', task_id).css('display', 'none');
+                const $div = $('<div>').addClass('todo-task');
+                $('<span>').addClass('todo-check').appendTo($div);
+                $('<input>').addClass('taskName')
+                    .attr({ 'data-id': task_id, value: taskName, title: taskName, readonly: true })
+                    .appendTo($div);
+                $div.appendTo($li);
+                $('<img>').attr({ src: '../res/logo/close.svg', alt: 'delete' }).addClass('deleteTask').appendTo($li);
+                $('.todo-body ul').append($li);
+                $li.slideDown(200);
+            }
+        }
+
+        function removeTask(task_id) {
+            if (isPlannerView()) {
+                savePlannerTasks(getPlannerTasks().filter(function (t) { return t.id !== task_id; }));
+                const $li = $('#plannerList').find('li[data-id="' + task_id + '"]');
+                $li.slideUp(200, function () {
+                    $(this).remove();
+                    updatePlannerEmpty();
+                });
+            } else {
+                saveTodoTasks(getTodoTasks().filter(function (t) { return t.id !== task_id; }));
+                const $li = $('.todo-body ul').find('li[data-id="' + task_id + '"]');
+                $li.slideUp(200, function () { $(this).remove(); });
+            }
+        }
+
+        function toggleTaskCompletion(task_id) {
+            const task = getTodoTasks().find(function (t) { return t.id === task_id; });
+            if (!task) return;
+            task.completed = !task.completed;
+            saveTodoTasks(getTodoTasks());
+            syncAll();
+        }
+
+        function changePlannerStatus(task_id, status) {
+            const task = getPlannerTasks().find(function (t) { return t.id === task_id; });
+            if (!task) return;
+            task.status = status;
+            savePlannerTasks(getPlannerTasks());
+            syncAll();
+        }
+
+        // ---- Copy / edit task name (both views) ----
+        function copyTaskName($input) {
+            if (!$input.attr('readonly')) return;
+            const text = $input.val();
+            navigator.clipboard.writeText(text).then(function () {
+                const $li = $input.closest('li');
+                $li.css('background-color', 'rgba(255, 255, 255, 0.2)');
+                setTimeout(function () { $li.css('background-color', ''); }, 200);
+            });
+        }
+
+        function startEditTaskName($input) {
+            $input.attr('readonly', false);
+            $input.focus();
+        }
+
+        function endEditTaskName($input) {
+            $input.attr('readonly', true);
+            const task_id = $input.closest('li').data('id');
+            const taskName = $input.val().trim();
+            const isPlan = $input.closest('#plannerList').length > 0;
+
+            if (isPlan) {
+                const task = getPlannerTasks().find(function (t) { return t.id === task_id; });
+                if (!task) return;
+                if (taskName) {
+                    task.name = taskName;
+                    savePlannerTasks(getPlannerTasks());
+                    syncAll();
+                } else {
+                    $input.val(task.name);
+                }
+            } else {
+                const task = getTodoTasks().find(function (t) { return t.id === task_id; });
+                if (!task) return;
+                if (taskName) {
+                    task.name = taskName;
+                    saveTodoTasks(getTodoTasks());
+                    syncAll();
+                } else {
+                    $input.val(task.name);
+                }
+            }
+        }
+
+        // ---- Planner name: copy / inline edit (span-based) ----
+        function plannerCopyName($span) {
+            if ($span.closest('.planner-name-wrap').hasClass('editing')) return;
+            const text = $span.text();
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(function () {
+                const $li = $span.closest('li');
+                $li.css('background-color', 'rgba(255, 255, 255, 0.2)');
+                setTimeout(function () { $li.css('background-color', ''); }, 200);
+            });
+        }
+
+        function plannerStartEdit($span) {
+            const $wrap = $span.closest('.planner-name-wrap');
+            if (!$wrap.length || $wrap.hasClass('editing')) return;
+            const taskName = $span.text();
+            $wrap.addClass('editing').removeClass('overflow');
+            $wrap.find('.planner-name-marquee').remove();
+
+            const $input = $('<input>').addClass('planner-name planner-name-edit').attr({ value: taskName, title: taskName });
+            $wrap.append($input);
+            $input.focus();
+            $input.select();
+        }
+
+        function plannerEndEdit($input) {
+            const $wrap = $input.closest('.planner-name-wrap');
+            const task_id = $wrap.closest('li').data('id');
+            const taskName = $input.val().trim();
+            const task = getPlannerTasks().find(function (t) { return t.id === task_id; });
+            if (!task) return;
+            if (taskName) {
+                task.name = taskName;
+                savePlannerTasks(getPlannerTasks());
+            }
+            syncAll();
+        }
+
+        // ---- Priority Planner drag & drop ----
+        let plannerDrag = null;
+
+        function plannerMoveItem(fromIdx, toIdx) {
+            const drag = plannerDrag;
+            if (!drag || fromIdx === toIdx) return;
+            const items = drag.$list.children('li').get();
+            const first = new Map(items.map(function (el) { return [el, el.getBoundingClientRect()]; }));
+
+            if (fromIdx < toIdx) {
+                drag.$list[0].insertBefore(items[fromIdx], items[toIdx + 1]);
+            } else {
+                drag.$list[0].insertBefore(items[fromIdx], items[toIdx]);
+            }
+
+            requestAnimationFrame(function () {
+                const cur = drag.$list.children('li').get();
+                cur.forEach(function (el) {
+                    if (el === drag.$li[0] || !first.has(el)) return;
+                    const f = first.get(el);
+                    const r = el.getBoundingClientRect();
+                    const dx = f.left - r.left;
+                    const dy = f.top - r.top;
+                    if (dx === 0 && dy === 0) return;
+                    el.style.transition = 'none';
+                    el.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+                    void el.offsetHeight;
+                    el.style.transition = '';
+                    el.style.transform = '';
+                });
+            });
+        }
+
+        function plannerFindTargetIndex(y) {
+            const drag = plannerDrag;
+            if (!drag) return 0;
+            const items = drag.$list.children('li').get();
+            for (let i = 0; i < items.length; i++) {
+                const r = items[i].getBoundingClientRect();
+                if (y < r.top + r.height / 2) return i;
+            }
+            return items.length;
+        }
+
+        function plannerAutoScroll(y) {
+            const drag = plannerDrag;
+            if (!drag) return;
+            const scroller = drag.$list.closest('.planner-body')[0];
+            if (!scroller) return;
+            const rect = scroller.getBoundingClientRect();
+            const threshold = 36;
+            let dir = 0;
+            if (y < rect.top + threshold) dir = -1;
+            else if (y > rect.bottom - threshold) dir = 1;
+            if (!dir) return;
+            const dist = dir < 0 ? (rect.top + threshold - y) : (y - (rect.bottom - threshold));
+            scroller.scrollTop += dir * Math.min(12, 3 + dist / 4);
+        }
+
+        function plannerCommitOrder(drag) {
+            if (!drag) return;
+            const order = drag.$list.children('li').get().map(function (el) {
+                return $(el).data('id');
+            });
+            const byId = {};
+            getPlannerTasks().forEach(function (t) { byId[t.id] = t; });
+            data.planner = order.map(function (id) { return byId[id]; }).filter(Boolean);
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        $('#plannerList').on('pointerdown', '.planner-handle', function (e) {
+            if (e.button !== 0) return;
+            e.preventDefault();
+            const $li = $(this).closest('li');
+            const $list = $li.closest('ul');
+
+            plannerDrag = {
+                $li: $li,
+                $list: $list,
+                startY: e.clientY,
+                moved: false
+            };
+
+            function onMove(ev) {
+                const drag = plannerDrag;
+                if (!drag) return;
+                if (!drag.$li[0].isConnected) { onUp(); return; }
+                const dy = ev.clientY - drag.startY;
+                if (!drag.moved && Math.abs(dy) < 5) return;
+                if (!drag.moved) {
+                    drag.moved = true;
+                    drag.$li.addClass('dragging');
+                    document.body.style.userSelect = 'none';
+                }
+                const items = drag.$list.children('li').get();
+                const fromIdx = items.indexOf(drag.$li[0]);
+                let toIdx = plannerFindTargetIndex(ev.clientY);
+                if (toIdx > fromIdx) toIdx -= 1;
+                plannerMoveItem(fromIdx, toIdx);
+                plannerAutoScroll(ev.clientY);
+            }
+
+            function onUp() {
+                const drag = plannerDrag;
+                plannerDrag = null;
+                document.removeEventListener('pointermove', onMove);
+                document.removeEventListener('pointerup', onUp);
+                document.body.style.userSelect = '';
+                if (drag && drag.moved) {
+                    drag.$li.removeClass('dragging');
+                    plannerCommitOrder(drag);
+                }
+            }
+
+            document.addEventListener('pointermove', onMove);
+            document.addEventListener('pointerup', onUp);
         });
 
-        // Delete task
+        // ---- Events ----
+        // List view: toggle completion
+        $('.todo-body ul').off("click", ".todo-check").on('click', '.todo-check', function () {
+            toggleTaskCompletion($(this).closest('li').data('id'));
+        });
+
+        // List view: delete task
         $('.todo-body ul').off("click", ".deleteTask").on('click', '.deleteTask', function () {
-            const task_id = $(this).closest('li').data('id');
-            removeTask(task_id);
+            removeTask($(this).closest('li').data('id'));
+        });
+
+        // Planner: delete task
+        $('#plannerList').off("click", ".planner-delete").on('click', '.planner-delete', function () {
+            removeTask($(this).closest('li').data('id'));
+        });
+
+        // Planner: change status
+        $('#plannerList').off("change", ".planner-status").on('change', '.planner-status', function () {
+            const $li = $(this).closest('li');
+            changePlannerStatus($li.data('id'), $(this).val());
         });
 
         // Add task button
@@ -708,14 +1072,18 @@ $(document).ready(function () {
             }
         });
 
-        // Delete all tasks
+        // Delete all tasks (active view)
         $("#deleteAllTaskBtn").off("click").on('click', function () {
-            if (confirm("Reset all tasks ?")) {
+            if (isPlannerView()) {
+                if (!confirm("Reset all planner tasks ?")) return;
+                data.planner = [];
+            } else {
+                if (!confirm("Reset all tasks ?")) return;
                 data.todo = [];
-                localStorage.setItem(key, JSON.stringify(data));
-                displayTasks();
             }
-        })
+            localStorage.setItem(key, JSON.stringify(data));
+            syncAll();
+        });
 
         // Enter key on input
         $('#taskName').off("keypress").on('keypress', function (event) {
@@ -731,42 +1099,42 @@ $(document).ready(function () {
             }
         });
 
-        // Click to Copy 
-        $('.todo-body ul').on('click', '.taskName', function (e) {
-            // Only copy if not in edit mode (readonly is true)
-            if ($(this).attr('readonly')) {
-                const text = $(this).val();
-                navigator.clipboard.writeText(text).then(() => {
-                    const $li = $(this).closest('li');
-                    $li.css('background-color', 'rgba(255, 255, 255, 0.2)');
-                    setTimeout(() => {
-                        $li.css('background-color', '');
-                    }, 200);
-                });
-            }
+        // Click to Copy (both views)
+        $('.todo-body ul').off('click', '.taskName').on('click', '.taskName', function () {
+            copyTaskName($(this));
+        });
+        $('#plannerList').off('click', '.planner-name').on('click', '.planner-name', function () {
+            plannerCopyName($(this));
         });
 
-        // EDIT TASK 
-        $(".todo-body ul").on("dblclick", ".taskName", function () {
-            $(this).attr("readonly", false);
-            $(this).focus();
+        // EDIT TASK (both views)
+        $(".todo-body ul").off("dblclick", ".taskName").on("dblclick", ".taskName", function () {
+            startEditTaskName($(this));
         });
-        $(".todo-body ul").on("blur", ".taskName", function () {
-            $(this).attr("readonly", true);
-            let task_id = $(this).closest("li").data("id");
-            let taskName = $(this).val().trim();
-            if (taskName) {
-                data.todo.forEach((t) => {
-                    if (t.id == task_id) {
-                        t.name = taskName;
-                    }
-                })
-                localStorage.setItem(key, JSON.stringify(data));
-                displayTasks();
-            }
-        })
+        $(".todo-body ul").off("blur", ".taskName").on("blur", ".taskName", function () {
+            endEditTaskName($(this));
+        });
+        $('#plannerList').off("dblclick", ".planner-name").on("dblclick", ".planner-name", function () {
+            plannerStartEdit($(this));
+        });
+        $('#plannerList').off("blur", ".planner-name-edit").on("blur", ".planner-name-edit", function () {
+            plannerEndEdit($(this));
+        });
+        $('#plannerList').off("keydown", ".planner-name-edit").on("keydown", ".planner-name-edit", function (e) {
+            if (e.key === "Enter") { e.preventDefault(); $(this).blur(); }
+        });
 
-        displayTasks();
+        // View tabs
+        $('#todoTabList').off("click").on('click', function () { switchView('list'); });
+        $('#todoTabPlanner').off("click").on('click', function () { switchView('planner'); });
+
+        // Restore preferred view
+        if (localStorage.getItem(TODO_VIEW_KEY) === 'planner') {
+            $('.todo-views').addClass('show-planner');
+            $('#todoTabPlanner').addClass('active');
+        }
+
+        syncAll();
     }
 
 
