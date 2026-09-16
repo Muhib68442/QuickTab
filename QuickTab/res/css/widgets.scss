@@ -420,7 +420,7 @@ input:-moz-placeholder, textarea:-moz-placeholder {
     overflow: hidden;
 }
 .planner-name-wrap.overflow:hover .planner-name-marquee {
-    animation: planner-name-scroll 5s linear infinite;
+    animation: planner-name-scroll 16s linear infinite;
 }
 .planner-name-wrap.overflow:hover {
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent);

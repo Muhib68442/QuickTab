@@ -1024,6 +1024,32 @@ $(document).ready(function() {
         window.location.href = chrome.runtime.getURL("index.html");
     });
 
+    // SIDEBAR ACTIVE SECTION (SCROLL SPY)
+    var $settingsMain = $(".settings-main");
+    var $navAnchors = $(".settings-sidebar-nav a[href^='#']");
+    var $sections = $(".settings-main section[id]");
+
+    function updateActiveNav(){
+        var el = $settingsMain[0];
+        if(!el || !$sections.length){ return; }
+        var pos = el.scrollTop + 88;
+        var current = $sections[0].id;
+        $sections.each(function(){
+            var contentPos = this.getBoundingClientRect().top - el.getBoundingClientRect().top + el.scrollTop;
+            if(contentPos <= pos){ current = this.id; }
+        });
+        var last = $sections[$sections.length - 1];
+        if(el.scrollTop + el.clientHeight >= el.scrollHeight - 2){
+            current = last.id;
+        }
+        $navAnchors.each(function(){
+            var active = this.getAttribute("href") === "#" + current;
+            $(this).parent("li").toggleClass("active", active);
+        });
+    }
+    $settingsMain.on("scroll", updateActiveNav);
+    updateActiveNav();
+
 
 
 
