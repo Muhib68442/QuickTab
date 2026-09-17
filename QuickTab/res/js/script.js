@@ -48,6 +48,10 @@ $(document).ready(function () {
 
             ],
 
+            "pins": [
+
+            ],
+
             "notepad": {
                 "tabs": [
                     { "id": "nt_1", "name": "Tab 1", "content": "Welcome to QuickTab!" }
@@ -653,6 +657,15 @@ $(document).ready(function () {
             localStorage.setItem(key, JSON.stringify(data));
         }
 
+        function getPins() {
+            return data.pins || [];
+        }
+
+        function savePins(items) {
+            data.pins = items;
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
         function generateId() {
             return 't_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
         }
@@ -661,10 +674,15 @@ $(document).ready(function () {
             return $('.todo-views').hasClass('show-planner');
         }
 
+        function isPinView() {
+            return $('.todo-views').hasClass('show-pin');
+        }
+
         // ---- Rendering ----
         function renderTodoList() {
             const tasks = getTodoTasks();
             const $list = $('.todo-body ul');
+            const $empty = $('#todoEmpty');
             $list.empty();
             tasks.forEach(function (task) {
                 const $li = $('<li>').attr('data-id', task.id);
@@ -677,6 +695,13 @@ $(document).ready(function () {
                 $('<img>').attr({ src: '../res/logo/close.svg', alt: 'delete' }).addClass('deleteTask').appendTo($li);
                 $list.append($li);
             });
+            if ($list.children('li').length) {
+                $list.css('display', '');
+                $empty.hide();
+            } else {
+                $list.hide();
+                $empty.show();
+            }
         }
 
         function buildStatusSelect(status) {
@@ -750,23 +775,63 @@ $(document).ready(function () {
             updatePlannerEmpty();
         }
 
+        // ---- Pinned text ----
+        function updatePinEmpty() {
+            const $list = $('#pinList');
+            const $empty = $('#pinEmpty');
+            if ($list.children('li').length) {
+                $list.show();
+                $empty.hide();
+            } else {
+                $list.hide();
+                $empty.show();
+            }
+        }
+
+        function buildPinItem(item) {
+            const $li = $('<li>').addClass('pin-item').attr('data-id', item.id);
+            $('<img>').attr({ src: '../res/logo/pin.svg', alt: 'pin' }).addClass('pin-icon').appendTo($li);
+            $('<input>').addClass('pin-text')
+                .attr({ 'data-id': item.id, value: item.text, title: item.text, readonly: true })
+                .appendTo($li);
+            $('<img>').attr({ src: '../res/logo/close.svg', alt: 'delete' }).addClass('pin-delete').appendTo($li);
+            return $li;
+        }
+
+        function renderPin() {
+            const items = getPins();
+            const $list = $('#pinList');
+            $list.empty();
+            items.forEach(function (item) {
+                $list.append(buildPinItem(item));
+            });
+            updatePinEmpty();
+        }
+
         function syncAll() {
             renderTodoList();
             renderPlanner();
+            renderPin();
         }
 
         // ---- View switching ----
         function switchView(view) {
             localStorage.setItem(TODO_VIEW_KEY, view);
+            $('.todo-views').removeClass('show-planner show-pin');
+            $('#todoTabList, #todoTabPlanner').removeClass('active');
+            $('#pinNavBtn').removeClass('active');
             if (view === 'planner') {
                 $('.todo-views').addClass('show-planner');
-                $('#todoTabList').removeClass('active');
                 $('#todoTabPlanner').addClass('active');
+                $('#taskName').attr('placeholder', 'Task Name');
                 renderPlanner();
+            } else if (view === 'pin') {
+                $('.todo-views').addClass('show-pin');
+                $('#taskName').attr('placeholder', 'Pin text');
+                renderPin();
             } else {
-                $('.todo-views').removeClass('show-planner');
-                $('#todoTabPlanner').removeClass('active');
                 $('#todoTabList').addClass('active');
+                $('#taskName').attr('placeholder', 'Task Name');
                 renderTodoList();
             }
         }
@@ -774,7 +839,16 @@ $(document).ready(function () {
         // ---- Task operations ----
         function addTask(taskName) {
             const task_id = generateId();
-            if (isPlannerView()) {
+            if (isPinView()) {
+                const items = getPins();
+                items.push({ id: task_id, text: taskName });
+                savePins(items);
+                const $li = buildPinItem({ id: task_id, text: taskName }).css('display', 'none');
+                $('#pinList').append($li);
+                $('#pinList').show();
+                $('#pinEmpty').hide();
+                $li.slideDown(200);
+            } else if (isPlannerView()) {
                 const tasks = getPlannerTasks();
                 tasks.push({ id: task_id, name: taskName, status: 'not_started' });
                 savePlannerTasks(tasks);
@@ -808,7 +882,14 @@ $(document).ready(function () {
         }
 
         function removeTask(task_id) {
-            if (isPlannerView()) {
+            if (isPinView()) {
+                savePins(getPins().filter(function (p) { return p.id !== task_id; }));
+                const $li = $('#pinList').find('li[data-id="' + task_id + '"]');
+                $li.slideUp(200, function () {
+                    $(this).remove();
+                    updatePinEmpty();
+                });
+            } else if (isPlannerView()) {
                 savePlannerTasks(getPlannerTasks().filter(function (t) { return t.id !== task_id; }));
                 const $li = $('#plannerList').find('li[data-id="' + task_id + '"]');
                 $li.slideUp(200, function () {
@@ -858,9 +939,20 @@ $(document).ready(function () {
             $input.attr('readonly', true);
             const task_id = $input.closest('li').data('id');
             const taskName = $input.val().trim();
+            const isPin = $input.closest('#pinList').length > 0;
             const isPlan = $input.closest('#plannerList').length > 0;
 
-            if (isPlan) {
+            if (isPin) {
+                const item = getPins().find(function (p) { return p.id === task_id; });
+                if (!item) return;
+                if (taskName) {
+                    item.text = taskName;
+                    savePins(getPins());
+                    syncAll();
+                } else {
+                    $input.val(item.text);
+                }
+            } else if (isPlan) {
                 const task = getPlannerTasks().find(function (t) { return t.id === task_id; });
                 if (!task) return;
                 if (taskName) {
@@ -1074,7 +1166,11 @@ $(document).ready(function () {
 
         // Delete all tasks (active view)
         $("#deleteAllTaskBtn").off("click").on('click', function () {
-            if (isPlannerView()) {
+            if (isPinView()) {
+                if (!confirm("Reset all pinned text ?")) return;
+                if (!confirm("Are you sure? All pinned text will be permanently deleted.")) return;
+                data.pins = [];
+            } else if (isPlannerView()) {
                 if (!confirm("Reset all planner tasks ?")) return;
                 data.planner = [];
             } else {
@@ -1124,14 +1220,46 @@ $(document).ready(function () {
             if (e.key === "Enter") { e.preventDefault(); $(this).blur(); }
         });
 
+        // Pin view: delete single pin
+        $('#pinList').off("click", ".pin-delete").on('click', '.pin-delete', function () {
+            removeTask($(this).closest('li').data('id'));
+        });
+
+        // Pin view: copy / inline edit
+        $('#pinList').off('click', '.pin-text').on('click', '.pin-text', function () {
+            copyTaskName($(this));
+        });
+        $('#pinList').off("dblclick", ".pin-text").on("dblclick", ".pin-text", function () {
+            startEditTaskName($(this));
+        });
+        $('#pinList').off("blur", ".pin-text").on("blur", ".pin-text", function () {
+            endEditTaskName($(this));
+        });
+        $('#pinList').off("keydown", ".pin-text").on("keydown", ".pin-text", function (e) {
+            if (e.key === "Enter") { e.preventDefault(); $(this).blur(); }
+        });
+
         // View tabs
-        $('#todoTabList').off("click").on('click', function () { switchView('list'); });
-        $('#todoTabPlanner').off("click").on('click', function () { switchView('planner'); });
+        let lastNonPinView = 'list';
+        $('#todoTabList').off("click").on('click', function () { lastNonPinView = 'list'; switchView('list'); });
+        $('#todoTabPlanner').off("click").on('click', function () { lastNonPinView = 'planner'; switchView('planner'); });
+        $('#pinNavBtn').off("click").on('click', function () {
+            if (isPinView()) {
+                switchView(lastNonPinView);
+            } else {
+                lastNonPinView = isPlannerView() ? 'planner' : 'list';
+                switchView('pin');
+            }
+        });
 
         // Restore preferred view
-        if (localStorage.getItem(TODO_VIEW_KEY) === 'planner') {
+        const savedView = localStorage.getItem(TODO_VIEW_KEY);
+        if (savedView === 'planner') {
             $('.todo-views').addClass('show-planner');
             $('#todoTabPlanner').addClass('active');
+        } else if (savedView === 'pin') {
+            $('.todo-views').addClass('show-pin');
+            $('#taskName').attr('placeholder', 'Pin text');
         }
 
         syncAll();
@@ -1227,7 +1355,7 @@ $(document).ready(function () {
                 $tab.on('click', function (e) {
                     if ($(e.target).hasClass('tab-close')) return;
                     if ($(e.target).is('input') && !$(e.target).attr('readonly')) return;
-                    const id = $(this).data('id');
+                    const id = $(this).attr('data-id');
                     if (id !== data.notepad.activeTab) {
                         saveActiveTabContent();
                         data.notepad.activeTab = id;
@@ -1244,7 +1372,7 @@ $(document).ready(function () {
                 });
 
                 $name.on('blur', function () {
-                    const id = $tab.data('id');
+                    const id = $tab.attr('data-id');
                     const tab = data.notepad.tabs.find(t => t.id === id);
                     if (tab) {
                         const val = $(this).val().trim();
@@ -1262,7 +1390,7 @@ $(document).ready(function () {
                 // Close button
                 $close.on('click', function (e) {
                     e.stopPropagation();
-                    const id = $tab.data('id');
+                    const id = $tab.attr('data-id');
                     deleteTab(id);
                 });
 
@@ -1302,11 +1430,16 @@ $(document).ready(function () {
             if (!confirmed) return;
 
             const idx = data.notepad.tabs.findIndex(t => t.id === tabId);
-            data.notepad.tabs = data.notepad.tabs.filter(t => t.id !== tabId);
+            if (idx < 0) return;
+
+            data.notepad.tabs.splice(idx, 1);
 
             if (data.notepad.activeTab === tabId) {
                 const newIdx = Math.min(idx, data.notepad.tabs.length - 1);
                 data.notepad.activeTab = data.notepad.tabs[newIdx].id;
+            }
+            if (!getActiveTab()) {
+                data.notepad.activeTab = data.notepad.tabs[0].id;
             }
             persist();
             renderTabs();

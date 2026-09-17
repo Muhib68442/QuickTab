@@ -268,11 +268,11 @@
                 <!-- TODO -->
                 <div class="todo-container">
                     <div class="todo-heading">
-                        <img src="../res/logo/todo.svg" alt="todo">
+                        <img src="../res/logo/pin.svg" alt="pinned text" id="pinNavBtn" title="Pinned Text">
                         <!-- View Tabs -->
-                        <div class="todo-tabs" title="Todo / Priority Planner">
+                        <div class="todo-tabs" title="Todo / Priority Planner / Pinned Text">
                             <button class="cal-tab active" id="todoTabList" data-view="list">
-                                <span class="cal-tab-label">List</span>
+                                <span class="cal-tab-label">Todo</span>
                             </button>
                             <button class="cal-tab" id="todoTabPlanner" data-view="planner">
                                 <span class="cal-tab-label">Planner</span>
@@ -283,10 +283,21 @@
 
                     <div class="todo-views">
                         <div class="todo-views-track">
+                        <!-- View: Pinned Text -->
+                        <div class="todo-view" id="todoPinView">
+                            <div class="pin-body">
+                                <ul id="pinList"></ul>
+                                <div class="pin-empty" id="pinEmpty" style="display:none;">
+                                    <p>No pinned text</p>
+                                    <span>Pin quick notes using the add bar below.</span>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- View: List -->
                         <div class="todo-view" id="todoListView">
                             <div class="todo-body">
-                                <ul>
+                                <ul id="todoList">
                                     <!-- <li> 
                                         <div class="todo-task">
                                             <span class="todo-check"></span>
@@ -296,6 +307,10 @@
                                         <img src="../res/logo/close.svg" alt="delete">
                                     </li> -->
                                 </ul>
+                                <div class="todo-empty" id="todoEmpty" style="display:none;">
+                                    <p>No tasks</p>
+                                    <span>Start typing below.</span>
+                                </div>
                             </div>
                         </div>
 

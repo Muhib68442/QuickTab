@@ -297,7 +297,7 @@
             <section id="tasks" class="s-card">
                 <header class="s-card-head">
                     <h3>Tasks</h3>
-                    <p class="s-card-desc">Manage the Todo List and Priority Planner widgets.</p>
+                    <p class="s-card-desc">Manage the Todo List, Priority Planner and Pinned Text widgets.</p>
                 </header>
 
                 <div class="s-card-body">
@@ -319,6 +319,15 @@
                             <div class="task-drag-hint">Drag the handle or use the arrows to set your execution order. Default status is Not Started.</div>
                             <p class="task-empty" id="plannerTaskEmpty">No plans yet. Click &quot;Add Plan&quot; to create one.</p>
                             <ul class="task-list" id="plannerTaskList"></ul>
+                        </div>
+
+                        <div class="task-group">
+                            <div class="task-toolbar">
+                                <h4 class="s-subhead">Pinned Text</h4>
+                                <button id="addPinTaskBtn" class="btn btn-primary btn-sm">&#43; Add Pin</button>
+                            </div>
+                            <p class="task-empty" id="pinTaskEmpty">No pinned text yet. Click &quot;Add Pin&quot; to create one.</p>
+                            <ul class="task-list" id="pinTaskList"></ul>
                         </div>
                     </div>
                 </div>

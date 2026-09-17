@@ -49,6 +49,10 @@ $(document).ready(function() {
 
             ],
 
+            "pins": [
+
+            ],
+
             "notepad": {
                 "tabs": [
                     { "id": "nt_1", "name": "Tab 1", "content": "Welcome to QuickTab!" }
@@ -167,7 +171,7 @@ $(document).ready(function() {
             "completed": "#22c55e"
         };
         let editingId = null;
-        let editingTarget = null; // "todo" | "planner"
+        let editingTarget = null; // "todo" | "planner" | "pin"
 
         function getTodo() { return data.todo || []; }
         function getPlanner() {
@@ -179,6 +183,7 @@ $(document).ready(function() {
             });
             return arr;
         }
+        function getPins() { return data.pins || []; }
         function save() { localStorage.setItem(key, JSON.stringify(data)); }
         function genId() {
             return "t_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
@@ -267,9 +272,35 @@ $(document).ready(function() {
             renderPlanner();
         }
 
+        // ---- Pinned text ----
+        function renderPin() {
+            const list = getPins();
+            const $list = $("#pinTaskList");
+            const $empty = $("#pinTaskEmpty");
+            $list.empty();
+            if (!list.length) { $empty.show(); return; }
+            $empty.hide();
+
+            list.forEach(function (p) {
+                const $li = $("<li>").attr("data-id", p.id);
+                const $dot = $("<span>").addClass("task-dot").css("background-color", "#8b5cf6");
+                const $name = $("<span>").addClass("task-name").attr("title", p.text).text(p.text);
+                const $edit = $("<button>").addClass("task-action-btn").attr("type", "button").text("Edit");
+                const $del = $("<button>").addClass("task-action-btn delete").attr("type", "button").text("Delete");
+
+                $li.append($dot, $name, $edit, $del);
+                $list.append($li);
+
+                $edit.on("click", function () { openModal("pin", p.id); });
+                $del.on("click", function () { removeTask("pin", p.id); });
+            });
+        }
+
         function removeTask(target, id) {
             if (!confirm("Delete this task?")) return;
-            if (target === "todo") {
+            if (target === "pin") {
+                data.pins = getPins().filter(function (p) { return p.id !== id; });
+            } else if (target === "todo") {
                 data.todo = getTodo().filter(function (t) { return t.id !== id; });
             } else {
                 data.planner = getPlanner().filter(function (t) { return t.id !== id; });
@@ -278,7 +309,7 @@ $(document).ready(function() {
             renderAll();
         }
 
-        function renderAll() { renderTodo(); renderPlanner(); }
+        function renderAll() { renderTodo(); renderPlanner(); renderPin(); }
 
         // ---- Modal ----
         function openModal(target, id) {
@@ -286,12 +317,16 @@ $(document).ready(function() {
             editingId = id || null;
             const isPlanner = editingTarget === "planner";
             const t = id
-                ? (isPlanner ? getPlanner() : getTodo()).find(function (x) { return x.id === id; })
+                ? (isPlanner ? getPlanner() : editingTarget === "pin" ? getPins() : getTodo()).find(function (x) { return x.id === id; })
                 : null;
-            $("#taskModalTitle").text(t ? (isPlanner ? "Edit Plan" : "Edit Task") : (isPlanner ? "Add Plan" : "Add Task"));
-            $("#taskFieldName").val(t ? t.name : "");
+            const label = editingTarget === "pin" ? "Pin" : (isPlanner ? "Plan" : "Task");
+            $("#taskModalTitle").text(t ? "Edit " + label : "Add " + label);
+            $("#taskFieldName").val(t ? (editingTarget === "pin" ? t.text : t.name) : "");
             if (isPlanner) $("#taskFieldStatus").val(t ? t.status : "not_started");
             $("#taskFieldStatusWrap").toggle(isPlanner);
+            const isPin = editingTarget === "pin";
+            $("#taskFieldName").closest(".schedule-modal-field").find("label").text(isPin ? "Text" : (isPlanner ? "Plan Name" : "Task Name"));
+            $("#taskFieldName").attr("placeholder", isPin ? "e.g. Remember to water the plants" : "e.g. Finish CIMS presentation");
             $("#taskModal").css("display", "flex");
             requestAnimationFrame(function () { $("#taskModal").addClass("show"); });
             $("#taskFieldName").focus();
@@ -316,7 +351,16 @@ $(document).ready(function() {
             const status = $("#taskFieldStatus").val();
             if (!name) { $("#taskFieldName").focus(); return; }
 
-            if (editingTarget === "planner") {
+            if (editingTarget === "pin") {
+                const list = getPins();
+                if (editingId) {
+                    const idx = list.findIndex(function (x) { return x.id === editingId; });
+                    if (idx !== -1) { list[idx].text = name; save(); }
+                } else {
+                    data.pins = list.concat({ id: genId(), text: name });
+                    save();
+                }
+            } else if (editingTarget === "planner") {
                 const list = getPlanner();
                 if (editingId) {
                     const idx = list.findIndex(function (x) { return x.id === editingId; });
@@ -345,6 +389,7 @@ $(document).ready(function() {
 
         $("#addTodoTaskBtn").on("click", function () { openModal("todo", null); });
         $("#addPlannerTaskBtn").on("click", function () { openModal("planner", null); });
+        $("#addPinTaskBtn").on("click", function () { openModal("pin", null); });
 
         // Drag & drop reorder in settings (planner only)
         $("#plannerTaskList").on("pointerdown", ".task-grip", function (e) {
@@ -642,36 +687,40 @@ $(document).ready(function() {
         function cardHTML(i) {
             return `
                 <div class="tinyapp-card" data-slot="${i}">
-                    <div class="tinyapp-card-head">
-                        <span class="tinyapp-card-num">${i + 1}</span>
-                        <span class="tinyapp-card-name">App ${i + 1}</span>
-                    </div>
-                    <div class="tinyapp-preview-wrap">
-                        <div class="tinyapp-tile-preview">
-                            <img class="tinyapp-preview-img" src="${DEFAULT_LOGO}" alt="">
-                            <span class="tinyapp-preview-label">App name</span>
+                    <div class="tinyapp-card-side">
+                        <div class="tinyapp-preview-wrap">
+                            <div class="tinyapp-tile-preview">
+                                <img class="tinyapp-preview-img" src="${DEFAULT_LOGO}" alt="">
+                                <span class="tinyapp-preview-label">App name</span>
+                            </div>
                         </div>
                     </div>
-                    <label class="tinyapp-field">
-                        <span>Name</span>
-                        <input type="text" class="tiny-name" placeholder="e.g. Gmail" autocomplete="off">
-                    </label>
-                    <label class="tinyapp-field">
-                        <span>Title (wide slot)</span>
-                        <input type="text" class="tiny-title" placeholder="e.g. Gmail Mail" autocomplete="off">
-                    </label>
-                    <label class="tinyapp-field">
-                        <span>URL</span>
-                        <input type="text" class="tiny-url" placeholder="https://... or file:///..." autocomplete="off">
-                    </label>
-                    <label class="tinyapp-field">
-                        <span>Logo file</span>
-                        <input type="text" class="tiny-logo" placeholder="myapp.svg" autocomplete="off">
-                    </label>
-                    <label class="tinyapp-wide">
-                        <input type="checkbox" class="tiny-wide">
-                        <span class="tinyapp-wide-text">Wide slot</span>
-                    </label>
+                    <div class="tinyapp-card-body">
+                        <div class="tinyapp-card-head">
+                            <span class="tinyapp-card-num">${i + 1}</span>
+                            <span class="tinyapp-card-name">App ${i + 1}</span>
+                        </div>
+                        <label class="tinyapp-field">
+                            <span>Name</span>
+                            <input type="text" class="tiny-name" placeholder="e.g. Gmail" autocomplete="off">
+                        </label>
+                        <label class="tinyapp-field">
+                            <span>URL</span>
+                            <input type="text" class="tiny-url" placeholder="https://... or file:///..." autocomplete="off">
+                        </label>
+                        <label class="tinyapp-field">
+                            <span>Title (wide slot)</span>
+                            <input type="text" class="tiny-title" placeholder="e.g. Gmail Mail" autocomplete="off">
+                        </label>
+                        <label class="tinyapp-field">
+                            <span>Logo file</span>
+                            <input type="text" class="tiny-logo" placeholder="myapp.svg" autocomplete="off">
+                        </label>
+                        <label class="tinyapp-wide">
+                            <input type="checkbox" class="tiny-wide">
+                            <span class="tinyapp-wide-text">Wide slot</span>
+                        </label>
+                    </div>
                 </div>`;
         }
 

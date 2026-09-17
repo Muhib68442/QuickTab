@@ -1235,8 +1235,8 @@ body::-webkit-scrollbar {
 
     .tinyapps-slots{
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
 
         &.disabled{
             opacity: 0.45;
@@ -1247,23 +1247,44 @@ body::-webkit-scrollbar {
 
     .tinyapp-card{
         display: flex;
-        flex-direction: column;
-        gap: 12px;
+        gap: 16px;
         padding: 16px;
-        border-radius: 13px;
+        border-radius: 14px;
         background-color: #ffffff;
-        border: 1px solid #ececef;
-        box-shadow: 0 1px 3px rgba(23, 23, 26, 0.04);
+        border: 1px solid #e8e9ee;
+        box-shadow: 0 2px 8px rgba(23, 23, 26, 0.05);
         box-sizing: border-box;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+        &:hover{
+            border-color: #d8dae0;
+            box-shadow: 0 4px 14px rgba(23, 23, 26, 0.08);
+        }
+
+        .tinyapp-card-side{
+            width: 172px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .tinyapp-card-body{
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
         .tinyapp-card-head{
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 9px;
 
             .tinyapp-card-num{
-                width: 26px;
-                height: 26px;
+                width: 24px;
+                height: 24px;
                 border-radius: 50%;
                 background-color: #17171a;
                 color: #ffffff;
@@ -1271,13 +1292,13 @@ body::-webkit-scrollbar {
                 align-items: center;
                 justify-content: center;
                 font-family: fontSB;
-                font-size: 13px;
+                font-size: 12.5px;
                 flex-shrink: 0;
             }
 
             .tinyapp-card-name{
                 font-family: fontSB;
-                font-size: 15px;
+                font-size: 14.5px;
                 color: #17171a;
                 font-weight: 400;
                 overflow: hidden;
@@ -1287,12 +1308,15 @@ body::-webkit-scrollbar {
         }
 
         .tinyapp-preview-wrap{
+            width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 14px;
-            background-color: #f5f5f8;
-            border-radius: 11px;
+            padding: 12px;
+            background: linear-gradient(165deg, #f2f2f6, #eaeaef);
+            border-radius: 12px;
+            min-height: 104px;
+            box-sizing: border-box;
 
             .tinyapp-tile-preview{
                 width: 64px;
@@ -1309,7 +1333,7 @@ body::-webkit-scrollbar {
                 transition: all 0.2s ease;
 
                 &.wide{
-                    width: 150px;
+                    width: 148px;
                     height: 64px;
                     flex-direction: row;
                     gap: 12px;
@@ -1350,12 +1374,31 @@ body::-webkit-scrollbar {
         .tinyapp-field{
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
 
             span{
                 font-family: fontM;
-                font-size: 13px;
+                font-size: 12.5px;
                 color: #17171a;
+            }
+
+            input{
+                width: 100%;
+                box-sizing: border-box;
+                font-family: fontM;
+                font-size: 13.5px;
+                color: #17171a;
+                padding: 8px 10px;
+                border: 1.5px solid #e2e3e7;
+                border-radius: 8px;
+                outline: none;
+                background-color: #ffffff;
+                transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+                &:focus{
+                    border-color: #17171a;
+                    box-shadow: 0 0 0 3px rgba(23, 23, 26, 0.07);
+                }
             }
         }
 
@@ -1363,7 +1406,7 @@ body::-webkit-scrollbar {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding-top: 2px;
+            padding-top: 4px;
             cursor: pointer;
 
             input{
@@ -1375,7 +1418,7 @@ body::-webkit-scrollbar {
 
             .tinyapp-wide-text{
                 font-family: fontM;
-                font-size: 14px;
+                font-size: 13.5px;
                 color: #17171a;
             }
         }
@@ -1600,8 +1643,16 @@ body::-webkit-scrollbar {
     .settings-main #bookmarks .bookmarks-grid{
         grid-template-columns: 1fr;
     }
+}
 
+@media (max-width: 900px){
     .settings-main #tinyapps .tinyapps-slots{
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 720px){
+    .settings-main #tinyapps .tinyapps-slots{
+        grid-template-columns: 1fr;
     }
 }
